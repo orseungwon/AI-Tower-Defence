@@ -401,7 +401,7 @@ function endGame(winner) {
   roundActive     = false;
   
   const message = winner === 'player' ? '승리!' : '패배!';
-  alert(message);
+
   
   // 버튼 비활성화
   document.getElementById('start-round-btn').disabled = true;

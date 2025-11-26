@@ -461,7 +461,7 @@ const structureInfo = {
     cost: 20, 
     description: '자동으로 적을 공격하는 방어 구조물',
     attackSpeed: 1.0,
-    attackPower: 3,
+    attackPower: 10,
     range: 3
   },
   resource: {
