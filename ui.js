@@ -400,6 +400,9 @@ async function requestAIStrategy() {
   if (!apiKey) {
     console.log('API 키 없음 - 기본 AI 사용');
     generateAIUnits();
+    console.log('tmddnjs');
+    return applyAIStrategy(applyDefaultAIStrategy());
+
     return;
   }
 

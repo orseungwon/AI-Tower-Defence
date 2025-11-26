@@ -1207,6 +1207,7 @@ function applyAIStrategy(strategy) {
 
 
 function applyDefaultAIStrategy() {
+  console.log('tmddnjs');
   return {
     structures: {
       build: { barracks: 0, population: 0, resource: 0, turret: 0 },
