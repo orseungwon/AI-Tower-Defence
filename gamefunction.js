@@ -1206,6 +1206,19 @@ function applyAIStrategy(strategy) {
 
 
 
+function applyDefaultAIStrategy() {
+  return {
+    structures: {
+      build: { barracks: 0, population: 0, resource: 0, turret: 0 },
+      demolish: { barracks: 0, population: 0, resource: 0, turret: 0 }
+    },
+    units: {
+      tank: 0,
+      melee: 0,
+      ranged: 0
+    }
+  };
+}
 
 
 

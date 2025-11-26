@@ -465,8 +465,9 @@ JSON 외의 텍스트는 절대 넣지 마라.`;
       console.error('API 오류:', error);
       console.log('기본 AI로 대체');
       generateAIUnits();
-      applyAIStrategy(strategy);
-      return;
+
+      return applyAIStrategy(applyDefaultAIStrategy());
+
     }
 
     const data = await response.json();
@@ -480,11 +481,16 @@ JSON 외의 텍스트는 절대 넣지 마라.`;
     } catch (parseError) {
       console.error('JSON 파싱 실패:', parseError);
       generateAIUnits();
+      return applyAIStrategy(applyDefaultAIStrategy());
+
+
     }
 
   } catch (err) {
     console.error('❌ API 호출 실패:', err);
     generateAIUnits();
-    applyAIStrategy(strategy);
+    return applyAIStrategy(applyDefaultAIStrategy());
+
+
   }
 }
