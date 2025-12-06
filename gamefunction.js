@@ -1217,18 +1217,27 @@ function applyAIStrategy(strategy) {
   // 2. 구조물 건설
   // ----------------------------------------
   if (strategy.structures?.build) {
-    console.log('\n 구조물 건설:');
-    for (let [type, count] of Object.entries(strategy.structures.build)) {
-      if (count > 0) {
-        const built = buildAIStructureAuto(type, count);
-        if (built > 0) {
-          const consumed = structureInfo[type].cost * built;
-          totalCost += consumed;
-          actionsLog.push(`건설: ${type} ${built}개 (비용 ${consumed})`);
-        }
+  console.log('\n 구조물 건설:');
+
+  // ⭐ 1) turret을 가장 먼저 처리하도록 정렬
+  const buildOrder = Object.entries(strategy.structures.build)
+    .sort((a, b) => {
+      const priority = { turret: 0, barracks: 1, resource: 2, population: 3 };
+      return priority[a[0]] - priority[b[0]];
+    });
+
+  // ⭐ 2) 정렬된 순서대로 건설
+  for (let [type, count] of buildOrder) {
+    if (count > 0) {
+      const built = buildAIStructureAuto(type, count);
+      if (built > 0) {
+        const consumed = structureInfo[type].cost * built;
+        totalCost += consumed;
+        actionsLog.push(`건설: ${type} ${built}개 (비용 ${consumed})`);
       }
     }
   }
+}
 
   // ----------------------------------------
   // 3. 유닛 생산 (랜덤 병영)
@@ -1473,32 +1482,62 @@ function collectGameState() {
     },
   };
 }
+
+function buildGameRuleJSON() {
+  return {
+    system: {
+      maxStructures: MAX_STRUCTURES,
+      baseRoundReward: 50,
+      resourceRewardPerStructure: structureInfo.resource.resourcePerRound
+    },
+    
+    structures: Object.fromEntries(
+      Object.entries(structureInfo).map(([key, s]) => [
+        key,
+        {
+          cost: s.cost,
+          description: s.description,
+          attackPower: s.attackPower ?? null,
+          attackSpeed: s.attackSpeed ?? null,
+          range: s.range ?? null,
+          resourcePerRound: s.resourcePerRound ?? null,
+          populationIncrease: s.populationIncrease ?? null
+        }
+      ])
+    ),
+
+    units: Object.fromEntries(
+      Object.entries(unitInfo).map(([key, u]) => [
+        key,
+        {
+          cost: u.cost,
+          population: u.population,
+          health: u.health,
+          attackPower: u.attackPower,
+          attackSpeed: u.attackSpeed,
+          range: u.range,
+          moveSpeed: u.moveSpeed,
+          productionTime: u.productionTime,
+          description: u.description
+        }
+      ])
+    )
+  };
+}
+
 // ===========================
 // AI 프롬프트 생성
 // ===========================
 
 function buildAIPrompt(state) {
+    const rules = buildGameRuleJSON();
   return `당신은 타워 디펜스 게임의 AI 플레이어입니다.
 상대 기지를 파괴하면 승리합니다.
 
 === 게임 규칙 ===
-- 유닛은 정해진 길을 따라 이동하며, 사거리 내 적을 자동 공격합니다
-- 포탑은 길 위의 적 유닛만 공격합니다 (사거리 3, 공격력 5)
-- 라운드 종료시 기본 자원 50 + 자원생산소당 20을 받습니다
-- 최대 건물 수: 10개
+${JSON.stringify(rules, null, 2)}
 
-=== 유닛 특성 ===
-| 유닛 | 비용 | 체력 | 공격력 | 사거리 | 특징 |
-| melee | 5 | 20 | 3 | 1 | 가성비 좋은 주력 |
-| ranged | 5 | 10 | 6 | 2 | 멀리서 공격, 체력 낮음 |
-| tank | 10 | 50 | 2 | 1 | 높은 체력, 방패 역할 |
 
-=== 구조물 특성 ===
-| 구조물 | 비용 | 효과 |
-| barracks | 20 | 유닛 생산 (필수) |
-| population | 20 | 최대 인구 +3 |
-| resource | 30 | 라운드당 자원 +20 |
-| turret | 20 | 자동 방어 (공격력 10, 사거리 3) |
 
 === 현재 상황 (라운드 ${state.round}) ===
 
