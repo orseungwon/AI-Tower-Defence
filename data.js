@@ -478,8 +478,8 @@ const structureInfo = {
     name: '포탑',
     cost: 20, 
     description: '자동으로 적을 공격하는 방어 구조물',
-    attackSpeed: 1.0,
-    attackPower: 3.5,
+    attackSpeed: 1.5,
+    attackPower: 3,
     range: 3
   },
   resource: {
