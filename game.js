@@ -227,7 +227,7 @@ function initGame() {
   
   // Start 버튼 활성화, Stop 버튼 비활성화
   document.getElementById('start-round-btn').disabled = false;
-  document.getElementById('stop-round-btn').disabled  = true;
+  //document.getElementById('stop-round-btn').disabled  = true;
 }
 
 // UI 초기화
@@ -273,6 +273,7 @@ function gameLoop() {
   let deltaTime = currentTime - lastUpdateTime;
   lastUpdateTime = currentTime;
   
+
   // deltaTime 상한선 적용 (탭 비활성화 후 복귀 시 큰 값 방지)
   if (deltaTime > MAX_DELTA_TIME) {
     deltaTime = MAX_DELTA_TIME;
@@ -383,7 +384,7 @@ cleanOldUnitRecords();
   
   // 버튼 상태 갱신
   document.getElementById('start-round-btn').disabled = false;
-  document.getElementById('stop-round-btn').disabled  = true;
+  //document.getElementById('stop-round-btn').disabled  = true;
   
   // 라운드 종료 상태 저장
   saveRoundState();
@@ -402,10 +403,10 @@ function endGame(winner) {
   
   const message = winner === 'player' ? '승리!' : '패배!';
 
-  
+  alert(`게임 종료: ${message}`);
   // 버튼 비활성화
   document.getElementById('start-round-btn').disabled = true;
-  document.getElementById('stop-round-btn').disabled  = true;
+  //document.getElementById('stop-round-btn').disabled  = true;
 }
 
 // ===========================
@@ -579,7 +580,7 @@ const totalImages   = Object.keys(images).length;
 
 function startGameIfReady() {
   if (loadedCount >= totalImages) {
-    console.log(`✅ 모든 이미지 로드 완료: ${loadedCount}/${totalImages}`);
+    console.log(`모든 이미지 로드 완료: ${loadedCount}/${totalImages}`);
     initGame();
   }
 }
@@ -591,11 +592,11 @@ Object.entries(images).forEach(([key, img]) => {
   } else {
     img.onload = () => {
       loadedCount++;
-      console.log(`이미지 로드: ${loadedCount}/${totalImages} - ${key}`);
+      //console.log(`이미지 로드: ${loadedCount}/${totalImages} - ${key}`);
       startGameIfReady();
     };
     img.onerror = () => {
-      console.error(`❌ 이미지 로드 실패: ${key} (${img.src})`);
+      console.error(`이미지 로드 실패: ${key} (${img.src})`);
       loadedCount++;
       startGameIfReady();
     };
@@ -608,7 +609,7 @@ startGameIfReady();
 // 타임아웃 (15초)
 setTimeout(() => {
   if (loadedCount < totalImages) {
-    console.warn(`⚠️ 타임아웃: ${loadedCount}/${totalImages}개만 로드됨. 강제 실행`);
+    console.warn(`타임아웃: ${loadedCount}/${totalImages}개만 로드됨. 강제 실행`);
     initGame();
   }
 }, 15000);

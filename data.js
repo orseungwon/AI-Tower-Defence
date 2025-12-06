@@ -71,14 +71,32 @@ class GameState {
       population: this.population,
       maxPopulation: this.maxPopulation,
       structureCount: this.structureCount,
-      ai: { ...this.ai }
-    };
+      ai: {
+      resource: this.ai.resource,
+      population: this.ai.population,
+      maxPopulation: this.ai.maxPopulation,
+      structureCount: this.ai.structureCount
+    }
+  };
   }
 
-  // 저장 데이터에서 복원
   fromSaveData(data) {
-    Object.assign(this, data);
-  }
+  this.round = data.round ?? this.round;
+  this.resource = data.resource ?? this.resource;
+  this.population = data.population ?? this.population;
+  this.maxPopulation = data.maxPopulation ?? this.maxPopulation;
+  this.structureCount = data.structureCount ?? this.structureCount;
+
+  // ai 블록 안전하게 복원
+  if (!this.ai) this.ai = {};
+
+  const ai = data.ai ?? {};
+  this.ai.resource = ai.resource ?? this.ai.resource;
+  this.ai.population = ai.population ?? this.ai.population;
+  this.ai.maxPopulation = ai.maxPopulation ?? this.ai.maxPopulation;
+  this.ai.structureCount = ai.structureCount ?? this.ai.structureCount;
+}
+
 
   // 초기화
   reset() {
@@ -461,7 +479,7 @@ const structureInfo = {
     cost: 20, 
     description: '자동으로 적을 공격하는 방어 구조물',
     attackSpeed: 1.0,
-    attackPower: 10,
+    attackPower: 3.5,
     range: 3
   },
   resource: {
@@ -514,8 +532,8 @@ const unitInfo = {
     population: 1,
     description: '높은 체력과 근거리 공격력을 가진 전사',
     health: 20,
-    attackPower: 3,
-    attackSpeed: 1,
+    attackPower: 4,
+    attackSpeed: 1.2,
     moveSpeed: 0.5,
     range: 1,
     productionTime: 2000,
@@ -526,9 +544,9 @@ const unitInfo = {
     population: 1,
     description: '멀리서 적을 공격하는 궁수',
     health: 10,
-    attackPower: 2,
-    attackSpeed: 2,
-    moveSpeed: 1,
+    attackPower: 6,
+    attackSpeed: 0.7,
+    moveSpeed: 1.3,
     range: 2,
     productionTime: 3000,
   },
@@ -537,12 +555,12 @@ const unitInfo = {
     cost: 10,
     population: 1,
     description: '매우 높은 방어력을 가진 중장갑 유닛',
-    health: 50,
-    attackPower: 1,
+    health: 60,
+    attackPower: 2,
     attackSpeed: 1,
-    moveSpeed: 1,
+    moveSpeed: 0.8,
     range: 1,
-    productionTime: 5000,
+    productionTime: 4000,
   }
 };
 
@@ -590,51 +608,123 @@ const unitInfo = {
 // - 게임에서 사용할 모든 타일/구조물/유닛 스프라이트를 미리 Image 객체로 만들어 둔다.
 // - key 이름은 game.js에서 접근할 때 사용된다.
 const images = {
+  // ===== 타일 =====
   dark_grass: new Image(),
+
   grass: new Image(),
+
   road: new Image(),
+
   base: new Image(),
+  base_ai: new Image(),
+
+  // ===== 구조물 =====
   population: new Image(),
+  population_ai: new Image(),
   barracks: new Image(),
+  barracks_ai: new Image(),
   turret: new Image(),
+  turret_ai: new Image(),
   resource: new Image(),
+  resource_ai: new Image(),
+
+  // ===== 유닛 (플레이어) =====
   unit_melee_move_1: new Image(),
   unit_melee_move_2: new Image(),
   unit_ranged_move_1: new Image(),
   unit_ranged_move_2: new Image(),
   unit_tank_move_1: new Image(),
   unit_tank_move_2: new Image(),
+
   unit_melee_attack_1: new Image(),
   unit_melee_attack_2: new Image(),
   unit_ranged_attack_1: new Image(),
   unit_ranged_attack_2: new Image(),
   unit_tank_attack_1: new Image(),
   unit_tank_attack_2: new Image(),
+
+  // ===== 유닛 (AI 전용) =====
+  unit_melee_move_1_ai: new Image(),
+  unit_melee_move_2_ai: new Image(),
+  unit_ranged_move_1_ai: new Image(),
+  unit_ranged_move_2_ai: new Image(),
+  unit_tank_move_1_ai: new Image(),
+  unit_tank_move_2_ai: new Image(),
+
+  unit_melee_attack_1_ai: new Image(),
+  unit_melee_attack_2_ai: new Image(),
+  unit_ranged_attack_1_ai: new Image(),
+  unit_ranged_attack_2_ai: new Image(),
+  unit_tank_attack_1_ai: new Image(),
+  unit_tank_attack_2_ai: new Image(),
+
+  // ===== 효과 =====
   laser_turret: new Image(),
   laser_ranged: new Image(),
+  
+  laser_turret_ai: new Image(),
+  laser_ranged_ai: new Image(),
 };
 
-// 각 이미지 리소스 파일 경로 설정
-// 실제 파일명과 일대일로 연결되며, 브라우저가 이 경로로 이미지를 로드한다.
-images.dark_grass.src = 'images/map_dark_grass.png';
-images.grass.src = 'images/map_grass.png';
-images.road.src = 'images/map_road.png';
-images.base.src = 'images/map_base.png';
-images.population.src = 'images/structure_population.png';
-images.barracks.src = 'images/structure_barracks.png';
-images.turret.src = 'images/structure_turret.png';
-images.resource.src = 'images/structure_resource.png';
-images.unit_melee_move_1.src = 'images/unit_melee_move_1.png';
-images.unit_melee_move_2.src = 'images/unit_melee_move_2.png';
-images.unit_ranged_move_1.src = 'images/unit_ranged_move_1.png';
-images.unit_ranged_move_2.src = 'images/unit_ranged_move_2.png';
-images.unit_tank_move_1.src = 'images/unit_tank_move_1.png';
-images.unit_tank_move_2.src = 'images/unit_tank_move_2.png';
-images.unit_melee_attack_1.src = 'images/unit_melee_attack_1.png';
-images.unit_melee_attack_2.src = 'images/unit_melee_attack_2.png';
-images.unit_ranged_attack_1.src = 'images/unit_ranged_attack_1.png';
-images.unit_ranged_attack_2.src = 'images/unit_ranged_attack_2.png';
-images.unit_tank_attack_1.src = 'images/unit_tank_attack_1.png';
-images.unit_tank_attack_2.src = 'images/unit_tank_attack_2.png';
-images.laser_turret.src = 'images/laser_turret.png';
-images.laser_ranged.src = 'images/laser_ranged.png';
+// ===== 타일 =====
+images.dark_grass.src      = 'images/map_dark_grass.png';
+
+
+images.grass.src           = 'images/map_grass.png';
+
+
+images.road.src            = 'images/map_road.png';
+
+
+images.base.src            = 'images/map_base.png';
+images.base_ai.src         = 'images/map_base_ai.png';
+
+// ===== 구조물 =====
+images.population.src      = 'images/structure_population.png';
+images.population_ai.src   = 'images/structure_population_ai.png';
+
+images.barracks.src        = 'images/structure_barracks.png';
+images.barracks_ai.src     = 'images/structure_barracks_ai.png';
+
+images.turret.src          = 'images/structure_turret.png';
+images.turret_ai.src       = 'images/structure_turret_ai.png';
+
+images.resource.src        = 'images/structure_resource.png';
+images.resource_ai.src     = 'images/structure_resource_ai.png';
+
+// ===== 유닛(플레이어) =====
+images.unit_melee_move_1.src        = 'images/unit_melee_move_1.png';
+images.unit_melee_move_2.src        = 'images/unit_melee_move_2.png';
+images.unit_ranged_move_1.src       = 'images/unit_ranged_move_1.png';
+images.unit_ranged_move_2.src       = 'images/unit_ranged_move_2.png';
+images.unit_tank_move_1.src         = 'images/unit_tank_move_1.png';
+images.unit_tank_move_2.src         = 'images/unit_tank_move_2.png';
+
+images.unit_melee_attack_1.src      = 'images/unit_melee_attack_1.png';
+images.unit_melee_attack_2.src      = 'images/unit_melee_attack_2.png';
+images.unit_ranged_attack_1.src     = 'images/unit_ranged_attack_1.png';
+images.unit_ranged_attack_2.src     = 'images/unit_ranged_attack_2.png';
+images.unit_tank_attack_1.src       = 'images/unit_tank_attack_1.png';
+images.unit_tank_attack_2.src       = 'images/unit_tank_attack_2.png';
+
+// ===== 유닛(AI 버전) =====
+images.unit_melee_move_1_ai.src     = 'images/unit_melee_move_1_ai.png';
+images.unit_melee_move_2_ai.src     = 'images/unit_melee_move_2_ai.png';
+images.unit_ranged_move_1_ai.src    = 'images/unit_ranged_move_1_ai.png';
+images.unit_ranged_move_2_ai.src    = 'images/unit_ranged_move_2_ai.png';
+images.unit_tank_move_1_ai.src      = 'images/unit_tank_move_1_ai.png';
+images.unit_tank_move_2_ai.src      = 'images/unit_tank_move_2_ai.png';
+
+images.unit_melee_attack_1_ai.src   = 'images/unit_melee_attack_1_ai.png';
+images.unit_melee_attack_2_ai.src   = 'images/unit_melee_attack_2_ai.png';
+images.unit_ranged_attack_1_ai.src  = 'images/unit_ranged_attack_1_ai.png';
+images.unit_ranged_attack_2_ai.src  = 'images/unit_ranged_attack_2_ai.png';
+images.unit_tank_attack_1_ai.src    = 'images/unit_tank_attack_1_ai.png';
+images.unit_tank_attack_2_ai.src    = 'images/unit_tank_attack_2_ai.png';
+
+// ===== 효과 =====
+images.laser_turret.src    = 'images/laser_turret.png';
+images.laser_ranged.src    = 'images/laser_ranged.png';
+
+images.laser_turret_ai.src    = 'images/laser_turret_ai.png';
+images.laser_ranged_ai.src    = 'images/laser_ranged_ai.png';

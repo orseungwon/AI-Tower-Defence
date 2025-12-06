@@ -55,7 +55,7 @@ cv.addEventListener('click', (e) => {
   function showBuildMenu() {
     structurePanel.classList.remove('active');
     document.getElementById('structure-list').style.display   = 'block';
-    document.getElementById('round-controls').style.display   = 'block';
+    //document.getElementById('round-controls').style.display   = 'block';
     document.getElementById('sidebar-header').textContent     = '건설 메뉴';
     selectedStructure     = null;
     selectedStructureType = null;
@@ -285,26 +285,27 @@ document.getElementById('sell-structure').addEventListener('click', () => {
 document.getElementById('start-round-btn').addEventListener('click', async () => {
   roundActive = true;
   document.getElementById('start-round-btn').disabled = true;
-  document.getElementById('stop-round-btn').disabled  = false;
+  //document.getElementById('stop-round-btn').disabled  = false;
 
   // Claude AI 전략 요청 (없으면 기본 AI)
+  saveRoundState();
 
   await requestAIStrategy();
   
-  saveRoundState();
+  
   startRound();
 
   console.log('라운드 시작!');
 });
 
 // 라운드 정지 버튼
-document.getElementById('stop-round-btn').addEventListener('click', () => {
-  roundActive = false;
-  document.getElementById('start-round-btn').disabled = false;
-  document.getElementById('stop-round-btn').disabled  = true;
+// document.getElementById('stop-round-btn').addEventListener('click', () => {
+//   roundActive = false;
+//   document.getElementById('start-round-btn').disabled = false;
+//   document.getElementById('stop-round-btn').disabled  = true;
   
-  console.log('라운드 중지!');
-});
+//   console.log('라운드 중지!');
+// });
 
 // 게임 초기화 버튼
 document.getElementById('reset-game-btn').addEventListener('click', () => {
@@ -313,7 +314,7 @@ document.getElementById('reset-game-btn').addEventListener('click', () => {
 
   structurePanel.classList.remove('active');
   document.getElementById('structure-list').style.display   = 'block';
-  document.getElementById('round-controls').style.display   = 'block';
+  //document.getElementById('round-controls').style.display   = 'block';
   document.getElementById('sidebar-header').textContent     = '건설 메뉴';
   selectedStructure     = null;
   selectedStructureType = null;
@@ -334,25 +335,87 @@ function getApiKey() {
   return localStorage.getItem('claude_api_key') || '';
 }
 
+// function setApiKey(key) {
+//   if (!key || key.trim() === "") {
+//     localStorage.removeItem('claude_api_key');
+//   } else {
+//     localStorage.setItem('claude_api_key', key.trim());
+//   }
+//   updateApiStatus();
+// }
+
 function setApiKey(key) {
-  localStorage.setItem('claude_api_key', key);
-  updateApiStatus();
+  const trimmed = key.trim();
+
+  if (!trimmed) {
+    // 공백 또는 빈 문자열 → 키 삭제
+    localStorage.removeItem('claude_api_key');
+    console.log("API 키 삭제됨");
+  } else {
+    // 정상적인 키 저장
+    localStorage.setItem('claude_api_key', trimmed);
+    console.log("API 키 저장됨:", trimmed);
+  }
+
+  updateApiStatus(); // UI 즉시 업데이트
 }
+
+
+
 
 function updateApiStatus() {
   const status = document.getElementById('api-status');
   if (!status) return;
   
   if (getApiKey()) {
-    status.textContent = 'AI 활성';
+    status.textContent = 'AI ON';
     status.className = 'connected';
   } else {
-    status.textContent = 'AI 비활성';
+    status.textContent = 'AI OFF';
     status.className = 'disconnected';
   }
 }
 
 // API 키 모달 처리 - 페이지 로드 후 실행
+// window.addEventListener('DOMContentLoaded', () => {
+//   const saveBtn = document.getElementById('save-api-key-btn');
+//   const skipBtn = document.getElementById('skip-api-key-btn');
+//   const changeBtn = document.getElementById('change-api-key-btn');
+//   const modal = document.getElementById('api-key-modal');
+//   const input = document.getElementById('api-key-input');
+
+//   if (saveBtn) {
+//     saveBtn.addEventListener('click', () => {
+//       const key = input.value.trim();
+//       setApiKey(key);
+//       if (modal) modal.classList.add('hidden');
+//       console.log('API 키 저장됨');
+//     });
+//   }
+
+//   if (skipBtn) {
+//     skipBtn.addEventListener('click', () => {
+//       if (modal) modal.classList.add('hidden');
+//       console.log('API 키 건너뜀 - 기본 AI 사용');
+//     });
+//   }
+
+//   if (changeBtn) {
+//     changeBtn.addEventListener('click', () => {
+//       if (input) input.value = getApiKey();
+//       if (modal) modal.classList.remove('hidden');
+//     });
+//   }
+
+//   // 초기 상태 설정
+//   updateApiStatus();
+  
+//   // 이미 API 키가 있으면 모달 숨기기
+//   if (getApiKey() && modal) {
+//     modal.classList.add('hidden');
+//   }
+// });
+
 window.addEventListener('DOMContentLoaded', () => {
   const saveBtn = document.getElementById('save-api-key-btn');
   const skipBtn = document.getElementById('skip-api-key-btn');
@@ -360,37 +423,51 @@ window.addEventListener('DOMContentLoaded', () => {
   const modal = document.getElementById('api-key-modal');
   const input = document.getElementById('api-key-input');
 
+  // 👉 수정된 save 버튼 (API 키 검증)
   if (saveBtn) {
-    saveBtn.addEventListener('click', () => {
+    saveBtn.addEventListener("click", async () => {
       const key = input.value.trim();
-      setApiKey(key);
-      if (modal) modal.classList.add('hidden');
-      console.log('API 키 저장됨');
-    });
+       // 🔥 validate 실행
+  const valid = await validateApiKey(key);
+
+  if (!valid) {
+    alert("API 키가 유효하지 않습니다! 기본 AI로 전환됩니다.");
+    localStorage.removeItem("claude_api_key");
+    updateApiStatus();
+    modal.classList.add("hidden");
+    return;
   }
 
+  // 🔥 정상적인 키일 때만 저장
+  setApiKey(key);
+  modal.classList.add("hidden");
+  console.log("API 키 검증 완료 → 저장됨");
+});
+  }
+
+  // 기존 skip 버튼
   if (skipBtn) {
     skipBtn.addEventListener('click', () => {
-      if (modal) modal.classList.add('hidden');
+      modal.classList.add('hidden');
       console.log('API 키 건너뜀 - 기본 AI 사용');
     });
   }
 
-  if (changeBtn) {
-    changeBtn.addEventListener('click', () => {
-      if (input) input.value = getApiKey();
-      if (modal) modal.classList.remove('hidden');
-    });
-  }
+  // 기존 change 버튼 
+  if (changeBtn) { changeBtn.addEventListener('click', () => {
+     input.value = getApiKey();
+     modal.classList.remove('hidden');
+     });
+     }
+
+
 
   // 초기 상태 설정
   updateApiStatus();
-  
-  // 이미 API 키가 있으면 모달 숨기기
-  if (getApiKey() && modal) {
-    modal.classList.add('hidden');
-  }
+
+  if (getApiKey()) modal.classList.add('hidden');
 });
+
 
 // Claude API 호출
 async function requestAIStrategy() {
@@ -400,51 +477,15 @@ async function requestAIStrategy() {
   if (!apiKey) {
     console.log('API 키 없음 - 기본 AI 사용');
     generateAIUnits();
-    console.log('tmddnjs');
+    console.log('기본 ai 유닛 생성');
     return applyAIStrategy(applyDefaultAIStrategy());
 
-    return;
+    
   }
 
   const state = collectGameState();
   
-  const prompt = `아래 게임 데이터를 기반으로 전략을 JSON으로 출력하세요.
-설명 금지. JSON만 반환하세요. 코드블록은 절대 포함하지 마세요.
-
-=== UNIT COST ===
-melee: 5
-ranged: 5
-tank: 10
-
-=== STRUCTURE COST ===
-barracks: 20
-population: 20
-resource: 30
-turret: 20
-
-=== GAME STATE ===
-AI resource: ${state.aiResource}
-AI units: melee ${state.aiUnits.melee}, ranged ${state.aiUnits.ranged}, tank ${state.aiUnits.tank}
-AI structures: barracks ${state.aiStructures.barracks}, population ${state.aiStructures.population}, resource ${state.aiStructures.resource}, turret ${state.aiStructures.turret}
-Enemy units: melee ${state.enemyUnits.melee}, ranged ${state.enemyUnits.ranged}, tank ${state.enemyUnits.tank}
-
-JSON 형식:
-{
-  "structures": {
-    "build": {"barracks": 0, "population": 0, "resource": 0, "turret": 0},
-    "demolish": {"barracks": 0, "population": 0, "resource": 0, "turret": 0}
-  },
-  "units": {
-    "tank": 0,
-    "melee": 0,
-    "ranged": 0
-  }
-}
-
-조건:
-반드시 위 JSON 형식을 유지해서 전략을 만들어라.
-JSON 외의 텍스트는 절대 넣지 마라.`;
-
+  const prompt = buildAIPrompt(state);
   try {
     console.log('📡 Claude API 호출 중...');
     
@@ -497,3 +538,27 @@ JSON 외의 텍스트는 절대 넣지 마라.`;
 
   }
 }
+
+async function validateApiKey(key) {
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 5,
+        messages: [{ role: "user", content: "ping" }]
+      })
+    });
+
+    return response.ok; // 200~299이면 true
+  } catch (e) {
+    return false;
+  }
+}
+

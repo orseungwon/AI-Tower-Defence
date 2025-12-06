@@ -7,14 +7,30 @@
 // ===========================
 
 // 타일 그리기
-function drawTile(imageKey, dx, dy, alpha = 1) {
-  const img = images[imageKey];
-  if (img.complete) {
+// function drawTile(imageKey, dx, dy, alpha = 1) {
+//   const img = images[imageKey];
+//   if (img.complete) {
+//     ctx.globalAlpha = alpha;
+//     ctx.drawImage(img, dx, dy, TILE, TILE);
+//     ctx.globalAlpha = 1;
+//   }
+// }
+function drawTile(imageKey, dx, dy, alpha = 1, owner = null) {
+  let key = imageKey;
+
+  // AI용 구조물 이미지 자동 변환
+  if (owner === 'ai') {
+    key = `${imageKey}_ai`;
+  }
+
+  const img = images[key];
+  if (img && img.complete) {
     ctx.globalAlpha = alpha;
     ctx.drawImage(img, dx, dy, TILE, TILE);
     ctx.globalAlpha = 1;
   }
 }
+
 
 // 유닛 그리기
 function drawUnit(unit) {
@@ -45,8 +61,13 @@ function drawUnit(unit) {
   }
   
   // 현재 상태에 따라 이동/공격 스프라이트 선택
-  const action = (hasTarget || hasBaseTarget || unit.atGoal) ? 'attack' : 'move';
-  const img    = images[`unit_${unit.type}_${action}_${unit.animFrame}`];
+  //const action = (hasTarget || hasBaseTarget || unit.atGoal) ? 'attack' : 'move';
+  //const img    = images[`unit_${unit.type}_${action}_${unit.animFrame}`];
+
+  let key = `unit_${unit.type}_${(hasTarget || hasBaseTarget || unit.atGoal) ? "attack" : "move"}_${unit.animFrame}`;
+  if (unit.owner === "ai") key += "_ai";
+
+  const img = images[key];
 
   ctx.save();
 
@@ -94,8 +115,10 @@ function renderMap() {
   
   // 2. 기지 타일 오버레이 + HP 바
   bases.forEach(base => {
-    ctx.drawImage(images.base, base.gx * TILE, base.gy * TILE, TILE, TILE);
-    
+    //ctx.drawImage(images.base, base.gx * TILE, base.gy * TILE, TILE, TILE);
+    const baseImg = base.owner === 'ai' ? images.base_ai : images.base;
+    ctx.drawImage(baseImg, base.gx * TILE, base.gy * TILE, TILE, TILE);
+
     const barWidth  = TILE;
     const barHeight = 6;
     const hpRatio   = base.hp / base.maxHp;
@@ -112,18 +135,32 @@ function renderMap() {
   });
 
   // 3. 구조물 오버레이 (플레이어)
-  Object.keys(structures.player).forEach(structureType => {
-    structures.player[structureType].forEach(pos => {
-      drawTile(structureType, pos.gx * TILE, pos.gy * TILE);
-    });
-  });
+  // Object.keys(structures.player).forEach(structureType => {
+  //   structures.player[structureType].forEach(pos => {
+  //     drawTile(structureType, pos.gx * TILE, pos.gy * TILE);
+  //   });
+  // });
   
-  // 3-2. 구조물 오버레이 (AI)
-  Object.keys(structures.ai).forEach(structureType => {
-    structures.ai[structureType].forEach(pos => {
-      drawTile(structureType, pos.gx * TILE, pos.gy * TILE);
-    });
+  // // 3-2. 구조물 오버레이 (AI)
+  // Object.keys(structures.ai).forEach(structureType => {
+  //   structures.ai[structureType].forEach(pos => {
+  //     drawTile(structureType, pos.gx * TILE, pos.gy * TILE);
+  //   });
+  // });
+  // 플레이어 구조물
+Object.keys(structures.player).forEach(structureType => {
+  structures.player[structureType].forEach(pos => {
+    drawTile(structureType, pos.gx * TILE, pos.gy * TILE, 1, 'player');
   });
+});
+
+// AI 구조물
+Object.keys(structures.ai).forEach(structureType => {
+  structures.ai[structureType].forEach(pos => {
+    drawTile(structureType, pos.gx * TILE, pos.gy * TILE, 1, 'ai');
+  });
+});
+
 
   // 3.5. 유닛 렌더링
   if (window.activeUnits && window.activeUnits.length > 0) {
@@ -203,6 +240,42 @@ function renderMap() {
 }
 
 // 레이저 이펙트 렌더링
+// function renderLaserEffects() {
+//   const currentTime = Date.now();
+  
+//   laserEffects = laserEffects.filter(laser => {
+//     return currentTime - laser.startTime < laser.duration;
+//   });
+  
+//   laserEffects.forEach(laser => {
+//     const fromX = laser.fromX * TILE + TILE / 2;
+//     const fromY = laser.fromY * TILE + TILE / 2;
+//     const toX   = laser.toX   * TILE + TILE / 2;
+//     const toY   = laser.toY   * TILE + TILE / 2;
+    
+//     const dx       = toX - fromX;
+//     const dy       = toY - fromY;
+//     const distance = Math.sqrt(dx * dx + dy * dy);
+//     const angle    = Math.atan2(dy, dx);
+    
+//     ctx.save();
+//     ctx.translate(fromX, fromY);
+//     ctx.rotate(angle);
+    
+//     const laserImg = images.laser_turret;
+//     if (laserImg.complete) {
+//       ctx.drawImage(
+//         laserImg,
+//         0,
+//         -12,
+//         distance,
+//         24
+//       );
+//     }
+    
+//     ctx.restore();
+//   });
+// }
 function renderLaserEffects() {
   const currentTime = Date.now();
   
@@ -220,27 +293,63 @@ function renderLaserEffects() {
     const dy       = toY - fromY;
     const distance = Math.sqrt(dx * dx + dy * dy);
     const angle    = Math.atan2(dy, dx);
-    
+
+    // === 🔥 turret owner에 따라 이미지 분리 ===
+    // laser.owner는 updateTurretAttack()에서 넣어줘야 한다.
+    const laserImgKey = (laser.owner === 'ai') ? 'laser_turret_ai' : 'laser_turret';
+    const laserImg = images[laserImgKey];
+
     ctx.save();
     ctx.translate(fromX, fromY);
     ctx.rotate(angle);
-    
-    const laserImg = images.laser_turret;
-    if (laserImg.complete) {
-      ctx.drawImage(
-        laserImg,
-        0,
-        -12,
-        distance,
-        24
-      );
+
+    if (laserImg && laserImg.complete) {
+      ctx.drawImage(laserImg, 0, -12, distance, 24);
     }
-    
+
     ctx.restore();
   });
 }
 
+
 // 마법 이펙트 렌더링
+// function renderMagicEffects() {
+//   const currentTime = Date.now();
+  
+//   magicEffects = magicEffects.filter(magic => {
+//     return currentTime - magic.startTime < magic.duration;
+//   });
+  
+//   magicEffects.forEach(magic => {
+//     const handOffsetX = magic.flipX ? -10 : 10;
+    
+//     const fromX = magic.fromX * TILE + TILE / 2 + handOffsetX;
+//     const fromY = magic.fromY * TILE + TILE / 2;
+//     const toX   = magic.toX   * TILE + TILE / 2;
+//     const toY   = magic.toY   * TILE + TILE / 2;
+    
+//     const dx       = toX - fromX;
+//     const dy       = toY - fromY;
+//     const distance = Math.sqrt(dx * dx + dy * dy);
+//     const angle    = Math.atan2(dy, dx);
+    
+//     const img = images.laser_ranged;
+    
+//     if (img.complete) {
+//       ctx.save();
+//       ctx.translate(fromX, fromY);
+//       ctx.rotate(angle);
+      
+//       if (magic.flipX) {
+//         ctx.scale(1, -1);
+//       }
+      
+//       ctx.drawImage(img, 0, -12, distance, 24);
+      
+//       ctx.restore();
+//     }
+//   });
+// }
 function renderMagicEffects() {
   const currentTime = Date.now();
   
@@ -255,29 +364,31 @@ function renderMagicEffects() {
     const fromY = magic.fromY * TILE + TILE / 2;
     const toX   = magic.toX   * TILE + TILE / 2;
     const toY   = magic.toY   * TILE + TILE / 2;
-    
+
     const dx       = toX - fromX;
     const dy       = toY - fromY;
     const distance = Math.sqrt(dx * dx + dy * dy);
     const angle    = Math.atan2(dy, dx);
-    
-    const img = images.laser_ranged;
-    
-    if (img.complete) {
+
+    // === ⭐ owner 기반 이미지 선택 ===
+    const laserKey = magic.owner === 'ai' ? 'laser_ranged_ai' : 'laser_ranged';
+    const img = images[laserKey];
+
+    if (img && img.complete) {
       ctx.save();
       ctx.translate(fromX, fromY);
       ctx.rotate(angle);
-      
+
       if (magic.flipX) {
         ctx.scale(1, -1);
       }
-      
+
       ctx.drawImage(img, 0, -12, distance, 24);
-      
       ctx.restore();
     }
   });
 }
+
 
 // ===========================
 // 배치 가능 여부 체크
@@ -398,6 +509,7 @@ function updateUnitMovement(deltaTime) {
           // 원거리 유닛이면 마법 이펙트 추가
           if (unit.type === 'ranged') {
             magicEffects.push({
+              owner: unit.owner,
               fromX:     unit.x,
               fromY:     unit.y,
               toX:       targetType === 'unit' ? target.x  : target.gx,
@@ -410,7 +522,7 @@ function updateUnitMovement(deltaTime) {
           
           // 데미지 적용
           target.hp -= unit.attackPower;
-          console.log(`공격! 대상 HP: ${target.hp}`);
+          //console.log(`공격! 대상 HP: ${target.hp}`);
           
           // 대상이 사망/파괴되었는지 체크
           if (target.hp <= 0) {
@@ -551,6 +663,7 @@ function updateTurretAttack(turret, owner, currentTime) {
   if (target) {
     // 레이저 이펙트 추가
     laserEffects.push({
+      owner: owner,
       fromX:     turret.gx,
       fromY:     turret.gy,
       toX:       target.x,
@@ -563,7 +676,7 @@ function updateTurretAttack(turret, owner, currentTime) {
     target.hp -= structureInfo.turret.attackPower;
     turret.lastAttackTime = currentTime;
     
-    console.log(`포탑 공격! 대상 HP: ${target.hp}`);
+    //console.log(`포탑 공격! 대상 HP: ${target.hp}`);
     
     // 대상이 사망하면 유닛 제거
     if (target.hp <= 0) {
@@ -859,19 +972,19 @@ function recordUnitSpawn(owner, unitType) {
 function showGameState() {
   console.clear();
   console.log('='.repeat(60));
-  console.log('📊 현재 게임 상태');
+  console.log(' 현재 게임 상태');
   console.log('='.repeat(60));
   
   // 라운드 정보
-  console.log(`\n🎮 현재 라운드: ${gameState.round}`);
+  console.log(`\n 현재 라운드: ${gameState.round}`);
   
   // 플레이어 정보
-  console.log('\n👤 플레이어:');
-  console.log(`  💰 자원: ${gameState.resource}`);
-  console.log(`  👥 인구수: ${gameState.population} / ${gameState.maxPopulation}`);
-  console.log(`  🏰 기지 체력: ${bases.find(b => b.owner === 'player').hp} / ${bases.find(b => b.owner === 'player').maxHp}`);
+  console.log('\n 플레이어:');
+  console.log(`   자원: ${gameState.resource}`);
+  console.log(`   인구수: ${gameState.population} / ${gameState.maxPopulation}`);
+  console.log(`   기지 체력: ${bases.find(b => b.owner === 'player').hp} / ${bases.find(b => b.owner === 'player').maxHp}`);
   
-  console.log('\n  🏗️  구조물:');
+  console.log('\n    구조물:');
   console.log(`    - 주거지: ${structures.player.population.length}개`);
   console.log(`    - 병영: ${structures.player.barracks.length}개`);
   console.log(`    - 포탑: ${structures.player.turret.length}개`);
@@ -885,19 +998,19 @@ function showGameState() {
   const playerRanged = playerUnitsLastRound.filter(u => u.type === 'ranged').length;
   const playerTank = playerUnitsLastRound.filter(u => u.type === 'tank').length;
   
-  console.log(`\n  ⚔️  이전 라운드(${prevRound}) 생성한 유닛:`);
+  console.log(`\n    이전 라운드(${prevRound}) 생성한 유닛:`);
   console.log(`    - 근접: ${playerMelee}개`);
   console.log(`    - 원거리: ${playerRanged}개`);
   console.log(`    - 방어: ${playerTank}개`);
   console.log(`    - 총: ${playerUnitsLastRound.length}개`);
   
   // AI 정보
-  console.log('\n🤖 AI:');
-  console.log(`  💰 자원: ${gameState.ai.resource}`);
-  console.log(`  👥 인구수: ${gameState.ai.population} / ${gameState.ai.maxPopulation}`);
-  console.log(`  🏰 기지 체력: ${bases.find(b => b.owner === 'ai').hp} / ${bases.find(b => b.owner === 'ai').maxHp}`);
+  console.log('\n AI:');
+  console.log(`   자원: ${gameState.ai.resource}`);
+  console.log(`   인구수: ${gameState.ai.population} / ${gameState.ai.maxPopulation}`);
+  console.log(`   기지 체력: ${bases.find(b => b.owner === 'ai').hp} / ${bases.find(b => b.owner === 'ai').maxHp}`);
   
-  console.log('\n  🏗️  구조물:');
+  console.log('\n    구조물:');
   console.log(`    - 주거지: ${structures.ai.population.length}개`);
   console.log(`    - 병영: ${structures.ai.barracks.length}개`);
   console.log(`    - 포탑: ${structures.ai.turret.length}개`);
@@ -910,14 +1023,14 @@ function showGameState() {
   const aiRanged = aiUnitsLastRound.filter(u => u.type === 'ranged').length;
   const aiTank = aiUnitsLastRound.filter(u => u.type === 'tank').length;
   
-  console.log(`\n  ⚔️  이전 라운드(${prevRound}) 생성한 유닛:`);
+  console.log(`\n    이전 라운드(${prevRound}) 생성한 유닛:`);
   console.log(`    - 근접: ${aiMelee}개`);
   console.log(`    - 원거리: ${aiRanged}개`);
   console.log(`    - 방어: ${aiTank}개`);
   console.log(`    - 총: ${aiUnitsLastRound.length}개`);
   
   // 구조물 상세 위치 정보
-  console.log('\n📍 플레이어 구조물 위치:');
+  console.log('\n 플레이어 구조물 위치:');
   structures.player.population.forEach((s, i) => {
     console.log(`  주거지 ${i+1}: (${s.gx}, ${s.gy})`);
   });
@@ -928,7 +1041,7 @@ function showGameState() {
     console.log(`  자원채취 ${i+1}: (${s.gx}, ${s.gy})`);
   });
   
-  console.log('\n📍 AI 구조물 위치:');
+  console.log('\n AI 구조물 위치:');
   structures.ai.population.forEach((s, i) => {
     console.log(`  주거지 ${i+1}: (${s.gx}, ${s.gy})${s.id ? ` [ID: ${s.id}]` : ''}`);
   });
@@ -988,7 +1101,7 @@ function demolishAIStructureAuto(structureType, count) {
       }
       
       demolished++;
-      console.log(`✅ ${structureType}${target.id ? ` ID ${target.id}` : ''} 철거 (환불: ${refund})`);
+      console.log(` ${structureType}${target.id ? ` ID ${target.id}` : ''} 철거 (환불: ${refund})`);
     }
   }
   
@@ -1035,13 +1148,13 @@ function buildAIStructureAuto(structureType, count) {
     
     // 자원 체크
     if (gameState.ai.resource < cost) {
-      console.warn(`❌ 자원 부족: ${structureType} 건설 중단 (필요: ${cost}, 보유: ${gameState.ai.resource})`);
+      console.warn(` 자원 부족: ${structureType} 건설 중단 (필요: ${cost}, 보유: ${gameState.ai.resource})`);
       break;
     }
     
     // 구조물 개수 체크
     if (gameState.ai.structureCount >= MAX_STRUCTURES) {
-      console.warn(`❌ 구조물 한계: 최대 ${MAX_STRUCTURES}개`);
+      console.warn(` 구조물 한계: 최대 ${MAX_STRUCTURES}개`);
       break;
     }
     
@@ -1062,7 +1175,7 @@ function buildAIStructureAuto(structureType, count) {
     }
     
     built++;
-    console.log(`✅ ${structureType} ID ${pos.id} 건설 (비용: ${cost})`);
+    console.log(` ${structureType} ID ${pos.id} 건설 (비용: ${cost})`);
   }
   
   return built;
@@ -1078,7 +1191,7 @@ function getRandomBarracks(barracksList) {
 
 
 function applyAIStrategy(strategy) {
-  console.log('\n🤖 AI 전략 적용 시작...');
+  console.log('\n AI 전략 적용 시작...');
   console.log('전략:', strategy);
 
   let totalCost = 0;
@@ -1088,7 +1201,7 @@ function applyAIStrategy(strategy) {
   // 1. 구조물 철거
   // ----------------------------------------
   if (strategy.structures?.demolish) {
-    console.log('\n🔨 구조물 철거:');
+    console.log('\n 구조물 철거:');
 
     for (let [type, count] of Object.entries(strategy.structures.demolish)) {
       if (count > 0) {
@@ -1104,7 +1217,7 @@ function applyAIStrategy(strategy) {
   // 2. 구조물 건설
   // ----------------------------------------
   if (strategy.structures?.build) {
-    console.log('\n🏗️ 구조물 건설:');
+    console.log('\n 구조물 건설:');
     for (let [type, count] of Object.entries(strategy.structures.build)) {
       if (count > 0) {
         const built = buildAIStructureAuto(type, count);
@@ -1121,11 +1234,11 @@ function applyAIStrategy(strategy) {
   // 3. 유닛 생산 (랜덤 병영)
   // ----------------------------------------
   if (strategy.units) {
-    console.log('\n⚔️ 유닛 생산:');
+    console.log('\n 유닛 생산:');
     const aiBarracks = structures.ai.barracks;
 
     if (aiBarracks.length === 0) {
-      console.warn('❌ 병영이 없어 유닛 생산 불가');
+      console.warn(' 병영이 없어 유닛 생산 불가');
     } else {
       aiBarracks.forEach(b => {
         if (!b.productionQueue) b.productionQueue = [];
@@ -1167,7 +1280,7 @@ function applyAIStrategy(strategy) {
   // ----------------------------------------
   // 4. 남은 자원으로 추가 근접 유닛 생산 (랜덤 병영)
   // ----------------------------------------
-  console.log(`\n💰 남은 자원: ${gameState.ai.resource}`);
+  console.log(`\n 남은 자원: ${gameState.ai.resource}`);
   const meleeCost = unitInfo.melee.cost;
 
   if (structures.ai.barracks.length > 0) {
@@ -1188,14 +1301,14 @@ function applyAIStrategy(strategy) {
 
     if (extra > 0) {
       actionsLog.push(`추가 생산: 근접 ${extra}개`);
-      console.log(`💡 남은 자원 활용 → 추가 근접 ${extra}개 생산`);
+      console.log(` 남은 자원 활용 → 추가 근접 ${extra}개 생산`);
     }
   }
 
   // ----------------------------------------
   // 5. 로그 출력 + UI 갱신
   // ----------------------------------------
-  console.log('\n📊 AI 전략 적용 완료');
+  console.log('\n AI 전략 적용 완료');
   console.log(`총 소비 자원: ${totalCost}`);
   console.log('실행된 액션:');
   actionsLog.forEach((a, i) => console.log(`  ${i + 1}. ${a}`));
@@ -1207,7 +1320,7 @@ function applyAIStrategy(strategy) {
 
 
 function applyDefaultAIStrategy() {
-  console.log('tmddnjs');
+  console.log('defaultaistrategy 시작');
   return {
     structures: {
       build: { barracks: 0, population: 0, resource: 0, turret: 0 },
@@ -1293,36 +1406,138 @@ function applyDefaultAIStrategy() {
 //   }
 // };
 
+// gamefunction.js
 function collectGameState() {
-  // 현재 맵 위 모든 유닛
   const units = window.activeUnits || [];
-
-  // AI 유닛
-  const aiUnits = {
-    melee:  units.filter(u => u.owner === 'ai' && u.type === 'melee').length,
-    ranged: units.filter(u => u.owner === 'ai' && u.type === 'ranged').length,
-    tank:   units.filter(u => u.owner === 'ai' && u.type === 'tank').length,
-  };
-
-  // 플레이어 유닛
-  const enemyUnits = {
-    melee:  units.filter(u => u.owner === 'player' && u.type === 'melee').length,
-    ranged: units.filter(u => u.owner === 'player' && u.type === 'ranged').length,
-    tank:   units.filter(u => u.owner === 'player' && u.type === 'tank').length,
-  };
-
-  // AI 구조물
-  const aiStructures = {
-    barracks:   structures.ai.barracks.length,
-    population: structures.ai.population.length,
-    resource:   structures.ai.resource.length,
-    turret:     structures.ai.turret.length,
-  };
+  
+  const playerBase = bases.find(b => b.owner === 'player');
+  const aiBase = bases.find(b => b.owner === 'ai');
+  
+  // 이전 라운드 유닛 생산 기록
+  const prevRound = gameState.round - 1;
+  
+  const aiUnitsLastRound = gameState.aiUnitUsage.filter(u => u.round === prevRound);
+  const playerUnitsLastRound = gameState.playerUnitUsage.filter(u => u.round === prevRound);
 
   return {
+    // 라운드 정보
+    round: gameState.round,
+    
+    // === AI 정보 ===
     aiResource: gameState.ai.resource,
-    aiUnits: aiUnits,           // ← 숫자 그대로 사용
-    aiStructures: aiStructures,
-    enemyUnits: enemyUnits      // ← 이미 계산한 enemyUnits 사용
+    aiBaseHp: aiBase.hp,
+    aiMaxPopulation: gameState.ai.maxPopulation,
+    aiStructureCount: gameState.ai.structureCount,
+    aiStructures: {
+      barracks: structures.ai.barracks.length,
+      population: structures.ai.population.length,
+      resource: structures.ai.resource.length,
+      turret: structures.ai.turret.length,
+    },
+    // 현재 맵 위 AI 유닛
+    aiUnits: {
+      melee: units.filter(u => u.owner === 'ai' && u.type === 'melee').length,
+      ranged: units.filter(u => u.owner === 'ai' && u.type === 'ranged').length,
+      tank: units.filter(u => u.owner === 'ai' && u.type === 'tank').length,
+    },
+    // ⭐ 이전 라운드 AI 유닛 생산 기록
+    aiUnitsLastRound: {
+      melee: aiUnitsLastRound.filter(u => u.type === 'melee').length,
+      ranged: aiUnitsLastRound.filter(u => u.type === 'ranged').length,
+      tank: aiUnitsLastRound.filter(u => u.type === 'tank').length,
+      total: aiUnitsLastRound.length,
+    },
+    
+    // === 적(플레이어) 정보 ===
+    enemyBaseHp: playerBase.hp,
+    enemyMaxPopulation: gameState.maxPopulation,
+    enemyStructureCount: gameState.structureCount,
+    enemyStructures: {
+      barracks: structures.player.barracks.length,
+      population: structures.player.population.length,
+      resource: structures.player.resource.length,
+      turret: structures.player.turret.length,
+    },
+    // 현재 맵 위 적 유닛
+    enemyUnits: {
+      melee: units.filter(u => u.owner === 'player' && u.type === 'melee').length,
+      ranged: units.filter(u => u.owner === 'player' && u.type === 'ranged').length,
+      tank: units.filter(u => u.owner === 'player' && u.type === 'tank').length,
+    },
+    // ⭐ 이전 라운드 적 유닛 생산 기록
+    enemyUnitsLastRound: {
+      melee: playerUnitsLastRound.filter(u => u.type === 'melee').length,
+      ranged: playerUnitsLastRound.filter(u => u.type === 'ranged').length,
+      tank: playerUnitsLastRound.filter(u => u.type === 'tank').length,
+      total: playerUnitsLastRound.length,
+    },
   };
+}
+// ===========================
+// AI 프롬프트 생성
+// ===========================
+
+function buildAIPrompt(state) {
+  return `당신은 타워 디펜스 게임의 AI 플레이어입니다.
+상대 기지를 파괴하면 승리합니다.
+
+=== 게임 규칙 ===
+- 유닛은 정해진 길을 따라 이동하며, 사거리 내 적을 자동 공격합니다
+- 포탑은 길 위의 적 유닛만 공격합니다 (사거리 3, 공격력 5)
+- 라운드 종료시 기본 자원 50 + 자원생산소당 20을 받습니다
+- 최대 건물 수: 10개
+
+=== 유닛 특성 ===
+| 유닛 | 비용 | 체력 | 공격력 | 사거리 | 특징 |
+| melee | 5 | 20 | 3 | 1 | 가성비 좋은 주력 |
+| ranged | 5 | 10 | 6 | 2 | 멀리서 공격, 체력 낮음 |
+| tank | 10 | 50 | 2 | 1 | 높은 체력, 방패 역할 |
+
+=== 구조물 특성 ===
+| 구조물 | 비용 | 효과 |
+| barracks | 20 | 유닛 생산 (필수) |
+| population | 20 | 최대 인구 +3 |
+| resource | 30 | 라운드당 자원 +20 |
+| turret | 20 | 자동 방어 (공격력 10, 사거리 3) |
+
+=== 현재 상황 (라운드 ${state.round}) ===
+
+[ 나(AI) ]
+- 자원: ${state.aiResource}
+- 기지 HP: ${state.aiBaseHp} / 100
+- 최대 인구: ${state.aiMaxPopulation}
+- 구조물 (${state.aiStructureCount}/10): 병영 ${state.aiStructures.barracks}, 주거지 ${state.aiStructures.population}, 자원 ${state.aiStructures.resource}, 포탑 ${state.aiStructures.turret}
+- 지난 라운드 생산: 근접 ${state.aiUnitsLastRound.melee}, 원거리 ${state.aiUnitsLastRound.ranged}, 탱크 ${state.aiUnitsLastRound.tank}
+
+[ 적(플레이어) ]
+- 기지 HP: ${state.enemyBaseHp} / 100
+- 최대 인구: ${state.enemyMaxPopulation}
+- 구조물 (${state.enemyStructureCount}/10): 병영 ${state.enemyStructures.barracks}, 주거지 ${state.enemyStructures.population}, 자원 ${state.enemyStructures.resource}, 포탑 ${state.enemyStructures.turret}
+- 지난 라운드 생산: 근접 ${state.enemyUnitsLastRound.melee}, 원거리 ${state.enemyUnitsLastRound.ranged}, 탱크 ${state.enemyUnitsLastRound.tank}
+
+=== 전략 가이드 예시 ===
+- 초반(1-3라운드): 1라운드 포탑건설은 필수, 이후 자원생산소 확보
+- 중반(4-7라운드): 인구수 확보, 병영 추가 확보
+- 후반(8+라운드): 대규모 공세, tank 앞세우고 melee/ranged 조합
+
+상황별 대응:
+- 적이 지난 라운드에 유닛을 많이 생산했으면 → 방어 강화 (포탑)
+- 적이 지난 라운드에 유닛을 적게 생산했으면 → 자원확보
+- 적 포탑 많으면 → tank로 버티면서 물량 공세
+- 적 원거리 많으면 → tank로 보호하며 진격
+- 적 근접 많으면 → 근접유닛으로 전력교환
+- 적 자원생산소 많으면 → 빠른 공세로 경제 성장 전에 압박
+- 내 기지가 적보다 HP 낮으면 → 유닛생산으로 승부
+
+=== 응답 형식 ===
+반드시 아래 JSON만 출력하세요. 다른 텍스트 금지.
+
+{
+  "strategy_reason": "간단한 전략 이유 (한 문장)",
+  "structures": {
+    "build": {"barracks": 0, "population": 0, "resource": 0, "turret": 0},
+    "demolish": {"barracks": 0, "population": 0, "resource": 0, "turret": 0}
+  },
+  "units": {"tank": 0, "melee": 0, "ranged": 0}
+}`;
 }

@@ -6,7 +6,7 @@
   <title>AI Tower Defence</title>
   <!-- 전체 게임 화면에 적용되는 공통 스타일 시트 -->
   <link rel="stylesheet" href="style.css">
-  <style>
+  <!-- <style>
     /* API 키 입력 모달 스타일 */
     #api-key-modal {
       position: fixed;
@@ -89,7 +89,7 @@
       background: #f04747;
       color: #fff;
     }
-  </style>
+  </style> -->
 </head>
 <body>
   <!-- API 키 입력 모달 -->
@@ -121,7 +121,7 @@
       <button id="change-api-key-btn" class="reset-btn" style="background:#5865f2; border-color:#4752c4;">
         API 키 설정
       </button>
-      <span id="api-status" class="disconnected">AI 비활성</span>
+      <span id="api-status" class="disconnected">AI OFF</span>
 
       <!-- 라운드 표시 영역 -->
       <div class="info-item">
@@ -318,9 +318,7 @@
             Start Round
           </button>
           <!-- 라운드 정지 버튼: 라운드가 시작되기 전에는 비활성화 상태 -->
-          <button id="stop-round-btn" class="round-btn stop" disabled>
-            Stop
-          </button>
+          
         </div>
 
       </div> <!-- sidebar 끝 -->
