@@ -543,11 +543,11 @@ const unitInfo = {
     cost: 5,
     population: 1,
     description: '멀리서 적을 공격하는 궁수',
-    health: 10,
+    health: 13,
     attackPower: 6,
     attackSpeed: 0.7,
     moveSpeed: 1.3,
-    range: 2,
+    range: 3,
     productionTime: 3000,
   },
   tank: {
