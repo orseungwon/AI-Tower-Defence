@@ -534,7 +534,7 @@ const unitInfo = {
     health: 20,
     attackPower: 4,
     attackSpeed: 1.1,
-    moveSpeed: 0.5,
+    moveSpeed: 0.7,
     range: 1,
     productionTime: 2000,
   },

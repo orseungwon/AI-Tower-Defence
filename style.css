@@ -535,3 +535,15 @@ canvas{
   background: #f04747;
   color: #fff;
 }
+#sound-toggle-btn {
+  background: #43b581;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+#sound-toggle-btn.sound-off {
+  background: #747f8d;
+}

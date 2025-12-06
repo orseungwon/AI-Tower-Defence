@@ -305,6 +305,7 @@ function renderLaserEffects() {
 
     if (laserImg && laserImg.complete) {
       ctx.drawImage(laserImg, 0, -12, distance, 24);
+       
     }
 
     ctx.restore();
@@ -384,6 +385,7 @@ function renderMagicEffects() {
       }
 
       ctx.drawImage(img, 0, -12, distance, 24);
+      
       ctx.restore();
     }
   });
@@ -518,7 +520,13 @@ function updateUnitMovement(deltaTime) {
               startTime: now,
               duration:  300
             });
+            soundManager.playMultiple('attack_ranged');
+          } else if (unit.type === 'melee') {
+            soundManager.playMultiple('attack_melee');
+          } else if (unit.type === 'tank') {
+            soundManager.playMultiple('attack_tank');
           }
+          
           
           // 데미지 적용
           target.hp -= unit.attackPower;
@@ -529,6 +537,7 @@ function updateUnitMovement(deltaTime) {
             if (targetType === 'unit') {
               const index = window.activeUnits.indexOf(target);
               if (index > -1) {
+                soundManager.playMultiple('remove_' + target.type);
                 window.activeUnits.splice(index, 1);
                 const state = target.owner === 'player' ? gameState : gameState.ai;
                 state.population -= unitInfo[target.type].population;
@@ -592,9 +601,17 @@ function updateUnitMovement(deltaTime) {
     unit.position.gx = Math.round(unit.x);
     unit.position.gy = Math.round(unit.y);
 
+   
+
     // 이동 중 애니메이션 프레임 토글
     if (currentTime - unit.lastAnimTime >= 1000) {
       unit.animFrame   = (unit.animFrame === 1 ? 2 : 1);
+        // 프레임에 맞춰 발소리 번갈아 재생
+      if (unit.animFrame === 1) {
+        soundManager.playMultiple('unit_move_1');
+      } else {
+        soundManager.playMultiple('unit_move_2');
+      }
       unit.lastAnimTime = currentTime;
     }
   });
@@ -671,6 +688,7 @@ function updateTurretAttack(turret, owner, currentTime) {
       startTime: currentTime,
       duration:  200
     });
+     soundManager.playMultiple('attack_turret');
     
     // 공격 적용
     target.hp -= structureInfo.turret.attackPower;

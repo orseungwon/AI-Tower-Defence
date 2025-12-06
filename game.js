@@ -296,6 +296,7 @@ function gameLoop() {
 // ===========================
 
 function startRound() {
+  soundManager.play('round_start');
   roundActive     = true;
   gameLoopRunning = true;
   document.querySelectorAll('.unit-button').forEach(b => {
@@ -338,6 +339,7 @@ function checkRoundEnd() {
 }
 
 function endRound() {
+   soundManager.play('round_end'); 
   roundActive = false;
 
 cleanOldUnitRecords();
@@ -349,7 +351,7 @@ cleanOldUnitRecords();
   // 자원 생산소 보너스 (20으로 수정)
   gameState.resource   += structures.player.resource.length * 20;
   gameState.ai.resource += structures.ai.resource.length * 20;
-  
+  soundManager.play('resource_structure'); 
   // 라운드 증가
   gameState.round++;
   
@@ -518,6 +520,7 @@ function placeStructure(gx, gy) {
   
   // UI 업데이트
   updateInfoPanel();
+  soundManager.play('money');
   
   return true;
 }

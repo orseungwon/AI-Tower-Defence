@@ -142,6 +142,8 @@ document.querySelectorAll('.unit-button').forEach(button => {
     if (gameState.resource < info.cost) return;
     if (gameState.population + info.population > gameState.maxPopulation) return;
     if (selectedStructure.productionQueue.length >= 2) return;
+
+    soundManager.play('money');
     
     gameState.resource -= info.cost;
     selectedStructure.productionQueue.push({
@@ -249,7 +251,7 @@ document.getElementById('structure-list').addEventListener('click', (e) => {
 
 document.getElementById('sell-structure').addEventListener('click', () => {
   if (!selectedStructure || !selectedStructureType) return;
-  
+  soundManager.play('resource_structure');
   const targetGx = selectedStructure.gx;
   const targetGy = selectedStructure.gy;
   
