@@ -484,7 +484,7 @@ const structureInfo = {
   },
   resource: {
     name: '자원 생산소',
-    cost: 40,
+    cost: 30,
     description: '라운드당 자원을 생산합니다',
     resourcePerRound: 20
   }
@@ -533,7 +533,7 @@ const unitInfo = {
     description: '높은 체력과 근거리 공격력을 가진 전사',
     health: 20,
     attackPower: 4,
-    attackSpeed: 1.2,
+    attackSpeed: 1.1,
     moveSpeed: 0.5,
     range: 1,
     productionTime: 2000,
@@ -545,9 +545,9 @@ const unitInfo = {
     description: '멀리서 적을 공격하는 궁수',
     health: 13,
     attackPower: 6,
-    attackSpeed: 0.7,
-    moveSpeed: 1.3,
-    range: 2.5,
+    attackSpeed: 0.8,
+    moveSpeed: 1.1,
+    range: 2.3,
     productionTime: 3000,
   },
   tank: {
