@@ -416,9 +416,12 @@ function endGame(winner) {
 // ===========================
 
 function saveRoundState() {
+  gameState.baseHp = bases.find(b => b.owner === 'player').hp;
+  gameState.ai.baseHp = bases.find(b => b.owner === 'ai').hp;
   const data = {
     gameState:  gameState.toSaveData(),
     structures: structures.toSaveData()
+    
   };
   localStorage.setItem('roundSave', JSON.stringify(data));
   console.log('라운드 저장 완료');

@@ -28,12 +28,14 @@ class GameState {
     this.population = 0;
     this.maxPopulation = 3;
     this.structureCount = 2;
+    this.baseHp = 100;
 
     this.ai = {
       resource: 50,
       population: 0,
       maxPopulation: 3,
-      structureCount: 2
+      structureCount: 2,
+       baseHp: 100
     };
 
     // 유닛 사용 기록
@@ -71,11 +73,13 @@ class GameState {
       population: this.population,
       maxPopulation: this.maxPopulation,
       structureCount: this.structureCount,
+      baseHp: this.baseHp,
       ai: {
       resource: this.ai.resource,
       population: this.ai.population,
       maxPopulation: this.ai.maxPopulation,
-      structureCount: this.ai.structureCount
+      structureCount: this.ai.structureCount,
+      baseHp: this.ai.baseHp
     }
   };
   }
@@ -86,6 +90,8 @@ class GameState {
   this.population = data.population ?? this.population;
   this.maxPopulation = data.maxPopulation ?? this.maxPopulation;
   this.structureCount = data.structureCount ?? this.structureCount;
+  this.baseHp = data.baseHp ?? this.baseHp;
+
 
   // ai 블록 안전하게 복원
   if (!this.ai) this.ai = {};
@@ -95,6 +101,10 @@ class GameState {
   this.ai.population = ai.population ?? this.ai.population;
   this.ai.maxPopulation = ai.maxPopulation ?? this.ai.maxPopulation;
   this.ai.structureCount = ai.structureCount ?? this.ai.structureCount;
+  this.ai.baseHp = ai.baseHp ?? this.ai.baseHp;
+  bases.find(b => b.owner === 'player').hp = this.baseHp;
+  bases.find(b => b.owner === 'ai').hp = this.ai.baseHp;
+
 }
 
 
@@ -109,6 +119,7 @@ class GameState {
     this.ai.population = 0;
     this.ai.maxPopulation = 3;
     this.ai.structureCount = 2;
+    this.ai.baseHp = 100;
     this.playerUnitUsage = [];
     this.aiUnitUsage = [];
   }
