@@ -322,6 +322,7 @@ function checkRoundEnd() {
     
     if (noUnits && noProduction && gameState.resource > 0) {
       document.getElementById('resource-value').classList.add('resource-warning');
+      
     } else {
       document.getElementById('resource-value').classList.remove('resource-warning');
     }
@@ -354,7 +355,7 @@ function checkRoundEnd() {
 function endRound() {
    soundManager.play('round_end'); 
   roundActive = false;
-
+flashRoundEndWarning();
 cleanOldUnitRecords();
   
   // 기본 자원 지급
@@ -372,10 +373,10 @@ cleanOldUnitRecords();
   if (gameState.round % 2 === 1) { //원래는 5로 나눔
     if (gameState.ai.structureCount < MAX_STRUCTURES) {
       // 다음 배치 가능한 주거지 위치 찾기
-      const nextPos = getNextAvailablePosition('population');
+      const nextPos = getNextAvailablePosition('resource');
       
       if (nextPos) {
-        structures.ai.population.push({
+        structures.ai.resource.push({
           gx: nextPos.gx,
           gy: nextPos.gy,
           id: nextPos.id
@@ -383,9 +384,9 @@ cleanOldUnitRecords();
         gameState.ai.structureCount++;
         gameState.ai.maxPopulation += 3;
         
-        console.log(`[라운드 ${gameState.round}] AI에게 주거지 부여 (ID: ${nextPos.id}, 위치: ${nextPos.gx},${nextPos.gy})`);
+        console.log(`[라운드 ${gameState.round}] AI에게 자원생산소 부여 (ID: ${nextPos.id}, 위치: ${nextPos.gx},${nextPos.gy})`);
       } else {
-        console.log(`[라운드 ${gameState.round}] AI 주거지 배치 위치 없음, 자원 +30`);
+        console.log(`[라운드 ${gameState.round}] AI 자원생산소 배치 위치 없음, 자원 +30`);
         gameState.ai.resource += 30;
       }
     } else {
@@ -652,3 +653,16 @@ const aiStrategyExample = {
     tank: 1        // 방어 유닛 1개
   }
 };
+
+function flashRoundEndWarning(ms = 2200) {
+  const el = document.getElementById('round-value');
+  if (!el) return;
+  el.classList.add('round-ended');
+
+  // 중복 타이머 방지
+  if (el._roundEndTimer) clearTimeout(el._roundEndTimer);
+  el._roundEndTimer = setTimeout(() => {
+    el.classList.remove('round-ended');
+    el._roundEndTimer = null;
+  }, ms);
+}

@@ -919,3 +919,26 @@ canvas{
   margin-top: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
+
+/* 라운드 종료 경고 배지 */
+#round-value.round-ended {
+  position: relative;
+  animation: blink-resource 1s infinite; /* 기존 깜빡임 재사용 */
+}
+
+#round-value.round-ended::after {
+  content: '라운드가 종료되었습니다. Start Round를 눌러 다음 라운드를 시작하세요!';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #f39c12;   /* 주황 배경 (자원 경고와 톤 통일) */
+  color: #000;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
+  margin-top: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}

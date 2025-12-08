@@ -674,7 +674,7 @@ function flashRoundWarning(ms = 1800) {
   const roundValueEl = document.getElementById('round-value');
   if (!roundValueEl) return;
   roundValueEl.classList.add('round-warning');
-  // 효과음 있으면 한 줄 추가 가능: soundManager.play('round_end');
+  soundManager.play('remove_melee');
   setTimeout(() => roundValueEl.classList.remove('round-warning'), ms);
 }
 
