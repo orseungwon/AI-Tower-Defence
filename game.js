@@ -311,11 +311,25 @@ function stopRound() {
   });
 }
 
+
 function checkRoundEnd() {
   // 1. 양쪽 자원 0인지 확인
   if (gameState.resource > 0 || gameState.ai.resource > 0) {
+    const noUnits = !window.activeUnits || window.activeUnits.length === 0;
+    const noProduction = 
+      !structures.player.barracks.some(b => b.currentProduction || b.productionQueue?.length > 0) &&
+      !structures.ai.barracks.some(b => b.currentProduction || b.productionQueue?.length > 0);
+    
+    if (noUnits && noProduction && gameState.resource > 0) {
+      document.getElementById('resource-value').classList.add('resource-warning');
+    } else {
+      document.getElementById('resource-value').classList.remove('resource-warning');
+    }
     return false;
   }
+  
+  // 자원 다 썼으면 클래스 제거
+  document.getElementById('resource-value').classList.remove('resource-warning');
   
   // 2. 맵에 유닛이 있는지 확인
   if (window.activeUnits && window.activeUnits.length > 0) {
@@ -337,7 +351,6 @@ function checkRoundEnd() {
   
   return true;
 }
-
 function endRound() {
    soundManager.play('round_end'); 
   roundActive = false;
