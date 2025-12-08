@@ -828,7 +828,7 @@ function spawnUnit(barracks, unitData, owner) {
   // 시작 방향 결정
   let flipX;
   if (owner === 'ai') {
-    if (spawnGx === 13) {
+    if (spawn.gx === 13) {
     flipX = false;
   } else {
     flipX = true;
