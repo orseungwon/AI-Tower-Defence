@@ -833,7 +833,6 @@ function spawnUnit(barracks, unitData, owner) {
   } else {
     flipX = true;
   }
-    flipX = true;
   } else {
     let passedFlips = 0;
     for (let i = 0; i <= idx; i++) {
