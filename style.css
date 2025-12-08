@@ -27,38 +27,42 @@ body{
 /* ----------------------------------
    게임 초기화(Reset) 및 디버그 버튼 공통 스타일
 ---------------------------------- */
-.reset-btn{
-  background:#e74c3c;
-  color:#fff;
-  border:2px solid #c0392b;
-  padding:8px 16px;
-  border-radius:6px;
-  font-size:14px;
-  font-weight:bold;
-  cursor:pointer;
-  transition:all 0.2s;
-  margin-right:auto; /* 왼쪽 정렬용 여백 */
-}
-.reset-btn:hover{
-  background:#c0392b;
-  transform:scale(1.05);
-}
-.reset-btn:active{
-  transform:scale(0.95);
-}
 
 /* ----------------------------------
    상단 정보 패널
    - 라운드, 자원, 인구수, 건물 수 등 표시
 ---------------------------------- */
-#top-info-panel{
-  background:#1a1a1a;
-  border-bottom:3px solid #444;
-  padding:12px 20px;
-  display:flex;
-  gap:40px;
-  color:#fff;
+#top-info-panel {
+  display: flex;
+  justify-content: space-between; /* 양 끝으로 정렬 */
+  align-items: center;
+  padding: 12px 20px;
+  background: #1a1a1a;
+  border-bottom: 3px solid #444;
 }
+
+/* 버튼 그룹 */
+#top-button-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* 오른쪽 info 그룹 */
+#top-info-group {
+  display: flex;
+  align-items: center;
+  gap: 30px; /* 라운드~건물 간격 */
+}
+
+/* info 텍스트 스타일 */
+.info-item {
+  display: flex;
+  gap: 6px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
 .info-item{
   display:flex;
   align-items:center;
@@ -514,39 +518,42 @@ canvas{
 /* ============================
       API STATUS LABEL
 ============================= */
+/* ============================
+      API STATUS BADGE (CLEAN)
+============================ */
 #api-status {
-  
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
+
   padding: 4px 10px;
-  border-radius: 4px;
   font-size: 12px;
-  margin-left: 10px;
-}
+  font-weight: bold;
 
-#api-status.connected {
-  background: #43b581;
-  color: #fff;
-}
-
-#api-status.disconnected {
-  background: #f04747;
-  color: #fff;
-}
-#sound-toggle-btn {
-  background: #43b581;
-  color: #fff;
-  border: none;
-  padding: 8px 12px;
   border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
+  border: 1px solid rgba(255,255,255,0.2);
+
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  backdrop-filter: blur(4px);
+
+  margin-left: 10px;
+  color: #fff;
+  user-select: none;
 }
-#sound-toggle-btn.sound-off {
-  background: #747f8d;
+
+/* 연결됨(초록) - 좀 더 고급스러운 톤 */
+#api-status.connected {
+  background: linear-gradient(135deg, #43b581, #369d6b);
+  border-color: rgba(0,0,0,0.2);
 }
+
+/* 연결 끊김(빨강) - 눈에 띄지만 과하지 않게 */
+#api-status.disconnected {
+  background: linear-gradient(135deg, #f04747, #c03939);
+  border-color: rgba(0,0,0,0.2);
+}
+
+
 /* ============================
    HELP MODAL
 ============================= */
@@ -741,32 +748,6 @@ canvas{
   transform: scale(1.05);
 }
 
-/* 사운드 버튼 */
-#sound-toggle-btn {
-  background: #43b581;
-  color: #fff;
-  border: 2px solid #3ca374;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-#sound-toggle-btn:hover {
-  background: #3ca374;
-  transform: scale(1.05);
-}
-
-#sound-toggle-btn.sound-off {
-  background: #747f8d;
-  border-color: #5d6670;
-}
-
-#sound-toggle-btn.sound-off:hover {
-  background: #5d6670;
-}
 
 /* style.css */
 @keyframes blink-resource {
@@ -797,4 +778,111 @@ canvas{
   white-space: nowrap;
   z-index: 100;
   margin-top: 8px;
+}
+
+#refresh-btn {
+  margin-left: 10px;
+  padding: 8px 16px;
+
+  background: #f39c12;
+  color: #fff;
+
+  border: 2px solid  #e67e22;
+  border-radius: 6px;
+
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3); /* 다른 버튼과 동일 */
+}
+
+#refresh-btn:hover {
+  background: #e67e22;
+  transform: scale(1.05);   /* ← 다른 버튼과 동일 "살짝 커지는 효과" */
+}
+
+#refresh-btn:active {
+  transform: scale(0.95);   /* 하나 더 일관성: 눌릴 때 작아짐 */
+  background: #d35400;
+}
+
+/* 공통 버튼 스타일 */
+.top-btn {
+  padding: 10px 22px;
+  min-width: 110px;
+  height: 48px;             /* 모든 버튼 높이 통일 */
+  font-size: 17px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: transform 0.15s ease, background 0.15s ease, border 0.15s ease;
+}
+
+/* Hover: 살짝 커지는 효과 */
+.top-btn:hover {
+  transform: scale(1.06);
+}
+
+/* Reset (danger) */
+.reset-btn {
+  background: #d64545;
+  color: white;
+  border-color: #a83232;
+}
+
+/* Primary (Refresh, API Settings) */
+.primary-btn {
+  background: #4e6eff;
+  color: white;
+  border-color: #3d52d0;
+}
+
+/* Secondary (Sound, AI ON/OFF) */
+.secondary-btn {
+  background: #2ecc71;
+  color: white;
+  border-color: #26a65b;
+}
+
+/* Utility (Help ?) */
+.utility-btn {
+  background: #636e72;
+  color: white;
+  border-color: #4a4e50;
+}
+
+#sound-toggle-btn {
+  background: #43b581;
+  color: #fff;
+  border: 2px solid #3ca374;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+#sound-toggle-btn:hover:not(.sound-off) {
+  background: #3ca374;
+  transform: scale(1.05);
+}
+
+#sound-toggle-btn.sound-off {
+  background: #747f8d;
+  border-color: #5d6670;
+}
+
+#sound-toggle-btn.sound-off:hover {
+  background: #5d6670;
+  transform: scale(1.05);
 }

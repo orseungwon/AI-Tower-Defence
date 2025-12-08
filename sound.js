@@ -229,14 +229,21 @@ playBgm() {
     this._updateButtonUI();
   }
 
+
+
   // UI 버튼 상태 업데이트
-  _updateButtonUI() {
-    const btn = document.getElementById('sound-toggle-btn');
-    if (btn) {
-      btn.textContent = this.enabled ? '🔊 Sound' : '🔇 Sound';
-      btn.classList.toggle('sound-off', !this.enabled);
-    }
+_updateButtonUI() {
+  const btn = document.getElementById('sound-toggle-btn');
+  if (!btn) return;
+
+  if (this.enabled) {
+    btn.innerHTML = `<span class="icon">🔊</span> Sound`;
+    btn.classList.remove("sound-off");
+  } else {
+    btn.innerHTML = `<span class="icon">🔇</span> Sound`;
+    btn.classList.add("sound-off");
   }
+}
 }
 
 // 전역 인스턴스 생성
@@ -246,11 +253,20 @@ const soundManager = new SoundManager();
 document.addEventListener('DOMContentLoaded', () => {
   soundManager.init();
   soundManager._updateButtonUI();
+
+  const soundBtn = document.getElementById('sound-toggle-btn');
+  soundBtn.addEventListener("click", () => {
+    soundManager.toggle();
+  });
 });
 
+
 // 첫 클릭 시 BGM 자동 재생 시작
-document.addEventListener('click', () => {
-  if (soundManager.loaded && soundManager.enabled) {
+document.addEventListener('click', (e) => {
+  // Sound 버튼은 여기에서 제외 (토글 직후 enabled가 변경되기 때문)
+  if (e.target.id === "sound-toggle-btn") return;
+
+  if (soundManager.loaded) {
     soundManager.playBgm();
   }
 }, { once: true });

@@ -111,45 +111,43 @@
   <!-- 게임 전체를 감싸는 최상위 컨테이너 -->
   <div id="game-wrapper">
 
-    <!-- 상단 정보 패널: 리셋 버튼, 디버그 버튼, 라운드/자원/인구/건물 정보 표시 -->
-    <div id="top-info-panel">
-      <!-- 게임 진행 상태를 완전히 초기화하는 버튼 -->
-      <button id="reset-game-btn" class="reset-btn">Reset</button>
-      <button id="help-btn" class="help-btn">?</button>
+<div id="top-info-panel">
 
-      <!-- API 키 설정 버튼 -->
-      <button id="change-api-key-btn" class="change-api-key-btn" > API 키 설정 </button>
-      <span id="api-status" class="disconnected">AI OFF</span>
-      <button id="sound-toggle-btn" onclick="soundManager.toggle()">Sound</button>
+  <!-- 왼쪽 버튼 그룹 -->
+  <div id="top-button-group">
+<button id="reset-game-btn" class="top-btn reset-btn">Reset</button>
+<button id="refresh-btn" class="top-btn primary-btn">Refresh</button>
+<button id="sound-toggle-btn" class="top-btn secondary-btn">Sound</button>
+<button id="help-btn" class="top-btn primary-btn">?</button>
+<button id="change-api-key-btn" class="top-btn primary-btn">API Settings</button>
+<span id="api-status" class="top-btn secondary-btn">AI ON</span>
 
-      <!-- 라운드 표시 영역 -->
-      <div class="info-item">
-        <span class="info-label">라운드</span>
-        <!-- 현재 진행 중인 라운드 번호 -->
-        <span class="info-value" id="round-value">1</span>
-      </div>
+  </div>
 
-      <!-- 자원 표시 영역 -->
-      <div class="info-item">
-        <span class="info-label">자원</span>
-        <!-- 플레이어가 현재 보유한 자원량 -->
-        <span class="info-value" id="resource-value">500</span>
-      </div>
-
-      <!-- 인구수 표시 영역 -->
-      <div class="info-item">
-        <span class="info-label">인구수</span>
-        <!-- 현재 사용 중인 인구수 / 최대 인구수 -->
-        <span class="info-value" id="population-value">0 / 10</span>
-      </div>
-
-      <!-- 건물 수 표시 영역 -->
-      <div class="info-item">
-        <span class="info-label">건물</span>
-        <!-- 현재 건설된 건물 수 / 건축 가능 최대 건물 수 -->
-        <span class="info-value" id="structure-count-value">2 / 10</span>
-      </div>
+  <!-- 오른쪽 정보 그룹 -->
+  <div id="top-info-group">
+    <div class="info-item">
+      <span class="info-label">라운드</span>
+      <span class="info-value" id="round-value">1</span>
     </div>
+
+    <div class="info-item">
+      <span class="info-label">자원</span>
+      <span class="info-value" id="resource-value">10</span>
+    </div>
+
+    <div class="info-item">
+      <span class="info-label">인구수</span>
+      <span class="info-value" id="population-value">0 / 3</span>
+    </div>
+
+    <div class="info-item">
+      <span class="info-label">건물</span>
+      <span class="info-value" id="structure-count-value">4 / 10</span>
+    </div>
+  </div>
+
+</div>
 
     <!-- 메인 게임 영역: 왼쪽 맵 캔버스 + 오른쪽 사이드바 -->
     <div id="game-container">

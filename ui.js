@@ -608,3 +608,7 @@ document.getElementById('help-modal').addEventListener('click', (e) => {
     document.getElementById('help-modal').classList.add('hidden');
   }
 });
+
+document.getElementById("refresh-btn").addEventListener("click", () => {
+  location.reload(true); // 페이지 즉시 새로고침
+});
