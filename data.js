@@ -224,10 +224,10 @@ const aiPopulationPositions = [
 
 const aiTurretPositions = [
   {id: 1, gx: 12, gy: 5},
-  {id: 2, gx: 11, gy: 5},
+  {id: 2, gx: 8, gy: 4},
   {id: 3, gx: 12, gy: 3},
   {id: 4, gx: 9, gy: 6},
-  {id: 5, gx: 8, gy: 4},
+  {id: 5, gx: 12, gy: 5},
   {id: 6, gx: 11, gy: 6},
   {id: 7, gx: 8, gy: 5},
   {id: 8, gx: 12, gy: 6},
