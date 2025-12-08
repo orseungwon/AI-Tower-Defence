@@ -547,3 +547,223 @@ canvas{
 #sound-toggle-btn.sound-off {
   background: #747f8d;
 }
+/* ============================
+   HELP MODAL
+============================= */
+#help-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#help-modal.hidden {
+  display: none;
+}
+
+.help-modal-content {
+  max-width: 550px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.help-tabs {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 15px;
+}
+
+.help-tab {
+  flex: 1;
+  padding: 8px 12px;
+  background: #444;
+  border: none;
+  border-radius: 6px;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.help-tab:hover {
+  background: #555;
+}
+
+.help-tab.active {
+  background: #5865f2;
+  color: #fff;
+}
+
+.help-content {
+  background: #36393f;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 15px;
+}
+
+.help-section {
+  display: none;
+}
+
+.help-section.active {
+  display: block;
+}
+
+.help-section h3 {
+  color: #ffd700;
+  margin: 0 0 10px 0;
+  font-size: 16px;
+}
+
+.help-section ul {
+  margin: 10px 0;
+  padding-left: 20px;
+}
+
+.help-section li {
+  margin: 8px 0;
+  color: #ddd;
+  line-height: 1.5;
+}
+
+.help-section p {
+  color: #ddd;
+  line-height: 1.6;
+  margin: 8px 0;
+}
+
+.highlight {
+  color: #43b581;
+  font-weight: bold;
+}
+
+.highlight.red {
+  color: #f04747;
+}
+
+.help-table {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.help-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #2f3136;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.help-icon {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+  background: #000;
+  border-radius: 4px;
+}
+
+.help-row div {
+  color: #ddd;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+  flex: 1;
+}
+
+.help-tip {
+  background: #2f3136;
+  padding: 10px;
+  border-radius: 6px;
+  border-left: 3px solid #faa61a;
+  margin-top: 15px;
+}
+
+#close-help-btn {
+  width: 100%;
+  padding: 12px;
+  background: #5865f2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#close-help-btn:hover {
+  background: #4752c4;
+}
+
+/* 도움말 버튼 */
+.help-btn {
+  width: 36px;
+  height: 36px;
+  background: #5865f2;
+  color: #fff;
+  border: 2px solid #4752c4;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-right: 10px;
+}
+
+.help-btn:hover {
+  background: #4752c4;
+  transform: scale(1.1);
+}
+
+
+/* API 키 설정 버튼 */
+#change-api-key-btn {
+  background: #5865f2;
+  color: #fff;
+  border: 2px solid #4752c4;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#change-api-key-btn:hover {
+  background: #4752c4;
+  transform: scale(1.05);
+}
+
+/* 사운드 버튼 */
+#sound-toggle-btn {
+  background: #43b581;
+  color: #fff;
+  border: 2px solid #3ca374;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#sound-toggle-btn:hover {
+  background: #3ca374;
+  transform: scale(1.05);
+}
+
+#sound-toggle-btn.sound-off {
+  background: #747f8d;
+  border-color: #5d6670;
+}
+
+#sound-toggle-btn.sound-off:hover {
+  background: #5d6670;
+}

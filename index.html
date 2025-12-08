@@ -6,90 +6,6 @@
   <title>AI Tower Defence</title>
   <!-- 전체 게임 화면에 적용되는 공통 스타일 시트 -->
   <link rel="stylesheet" href="style.css">
-  <!-- <style>
-    /* API 키 입력 모달 스타일 */
-    #api-key-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    #api-key-modal.hidden {
-      display: none;
-    }
-    .modal-content {
-      background: #2f3136;
-      padding: 30px;
-      border-radius: 12px;
-      text-align: center;
-      max-width: 500px;
-      color: #fff;
-    }
-    .modal-content h2 {
-      color: #ffd700;
-      margin-bottom: 15px;
-    }
-    .modal-content p {
-      color: #aaa;
-      margin-bottom: 20px;
-      font-size: 14px;
-    }
-    .modal-content input {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #444;
-      border-radius: 6px;
-      background: #1a1a1a;
-      color: #fff;
-      font-size: 14px;
-      margin-bottom: 15px;
-      box-sizing: border-box;
-    }
-    .modal-content input:focus {
-      border-color: #5865f2;
-      outline: none;
-    }
-    .modal-content button {
-      background: #5865f2;
-      color: #fff;
-      border: none;
-      padding: 12px 30px;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-      margin: 5px;
-    }
-    .modal-content button:hover {
-      background: #4752c4;
-    }
-    .modal-content .skip-btn {
-      background: #444;
-    }
-    .modal-content .skip-btn:hover {
-      background: #555;
-    }
-    /* API 상태 표시 */
-    #api-status {
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 12px;
-      margin-left: 10px;
-    }
-    #api-status.connected {
-      background: #43b581;
-      color: #fff;
-    }
-    #api-status.disconnected {
-      background: #f04747;
-      color: #fff;
-    }
-  </style> -->
 </head>
 <body>
   <!-- API 키 입력 모달 -->
@@ -108,7 +24,90 @@
       </p>
     </div>
   </div>
-
+  <!-- 게임 설명 모달 -->
+<div id="help-modal" class="hidden">
+  <div class="modal-content help-modal-content">
+    <h2>📖 게임 설명서</h2>
+    
+    <div class="help-tabs">
+      <button class="help-tab active" data-tab="goal">목표</button>
+      <button class="help-tab" data-tab="structures">구조물</button>
+      <button class="help-tab" data-tab="units">유닛</button>
+      <button class="help-tab" data-tab="controls">조작법</button>
+    </div>
+    
+    <div class="help-content">
+      <div class="help-section active" data-section="goal">
+        <h3>🎯 게임 목표</h3>
+        <p>상대방(AI) 기지를 파괴하면 <span class="highlight">승리!</span></p>
+        <p>내 기지가 파괴되면 <span class="highlight red">패배!</span></p>
+        <h3>⚙️ 기본 시스템</h3>
+        <ul>
+          <li><b>라운드제:</b> Start Round 버튼으로 시작</li>
+          <li><b>자원:</b> 매 라운드 50 지급 + 자원생산소 보너스</li>
+          <li><b>인구수:</b> 유닛 생산에 필요, 주거지로 증가</li>
+          <li><b>구조물:</b> 최대 10개까지 건설 가능</li>
+        </ul>
+      </div>
+      
+      <div class="help-section" data-section="structures">
+        <h3>🏗️ 구조물</h3>
+        <div class="help-table">
+          <div class="help-row">
+            <img src="images/structure_barracks.png" class="help-icon">
+            <div><b>병영 (20)</b><br>유닛을 생산합니다</div>
+          </div>
+          <div class="help-row">
+            <img src="images/structure_population.png" class="help-icon">
+            <div><b>주거지 (20)</b><br>최대 인구수 +3</div>
+          </div>
+          <div class="help-row">
+            <img src="images/structure_turret.png" class="help-icon">
+            <div><b>포탑 (20)</b><br>길 위의 적을 자동 공격</div>
+          </div>
+          <div class="help-row">
+            <img src="images/structure_resource.png" class="help-icon">
+            <div><b>자원생산소 (30)</b><br>라운드당 자원 +20</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="help-section" data-section="units">
+        <h3>⚔️ 유닛</h3>
+        <div class="help-table">
+          <div class="help-row">
+            <img src="images/unit_melee_move_1.png" class="help-icon">
+            <div><b>근접 유닛 (5)</b><br>체력 높음, 근거리 공격</div>
+          </div>
+          <div class="help-row">
+            <img src="images/unit_ranged_move_1.png" class="help-icon">
+            <div><b>원거리 유닛 (5)</b><br>긴 사거리, 낮은 체력</div>
+          </div>
+          <div class="help-row">
+            <img src="images/unit_tank_move_1.png" class="help-icon">
+            <div><b>탱크 유닛 (10)</b><br>매우 높은 체력, 느린 속도</div>
+          </div>
+        </div>
+        <p class="help-tip">💡 탱크를 앞세우고 원거리가 뒤에서 공격하는 조합이 효과적!</p>
+      </div>
+      
+      <div class="help-section" data-section="controls">
+        <h3>🎮 조작법</h3>
+        <ul>
+          <li><b>구조물 건설:</b> 우측 메뉴에서 선택 → 맵 클릭</li>
+          <li><b>구조물 선택:</b> 맵의 구조물 클릭</li>
+          <li><b>유닛 생산:</b> 병영 선택 → 유닛 버튼 클릭</li>
+          <li><b>구조물 판매:</b> 구조물 선택 → 판매 버튼 (50% 환불)</li>
+          <li><b>취소:</b> ESC 키</li>
+        </ul>
+        <h3>🤖 AI 모드</h3>
+        <p>API 키 설정 시 Claude AI가 전략적으로 플레이합니다!</p>
+      </div>
+    </div>
+    
+    <button id="close-help-btn">닫기</button>
+  </div>
+</div>
   <!-- 게임 전체를 감싸는 최상위 컨테이너 -->
   <div id="game-wrapper">
 
@@ -116,11 +115,10 @@
     <div id="top-info-panel">
       <!-- 게임 진행 상태를 완전히 초기화하는 버튼 -->
       <button id="reset-game-btn" class="reset-btn">Reset</button>
+      <button id="help-btn" class="help-btn">?</button>
 
       <!-- API 키 설정 버튼 -->
-      <button id="change-api-key-btn" class="reset-btn" style="background:#5865f2; border-color:#4752c4;">
-        API 키 설정
-      </button>
+      <button id="change-api-key-btn" class="change-api-key-btn" > API 키 설정 </button>
       <span id="api-status" class="disconnected">AI OFF</span>
       <button id="sound-toggle-btn" onclick="soundManager.toggle()">Sound</button>
 

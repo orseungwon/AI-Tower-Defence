@@ -564,3 +564,37 @@ async function validateApiKey(key) {
   }
 }
 
+
+// ========================
+// 도움말 모달 처리
+// ========================
+
+document.getElementById('help-btn').addEventListener('click', () => {
+  document.getElementById('help-modal').classList.remove('hidden');
+});
+
+document.getElementById('close-help-btn').addEventListener('click', () => {
+  document.getElementById('help-modal').classList.add('hidden');
+});
+
+// 탭 전환
+document.querySelectorAll('.help-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const tabName = tab.dataset.tab;
+    
+    // 탭 버튼 활성화
+    document.querySelectorAll('.help-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    
+    // 섹션 전환
+    document.querySelectorAll('.help-section').forEach(s => s.classList.remove('active'));
+    document.querySelector(`.help-section[data-section="${tabName}"]`).classList.add('active');
+  });
+});
+
+// 모달 바깥 클릭시 닫기
+document.getElementById('help-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'help-modal') {
+    document.getElementById('help-modal').classList.add('hidden');
+  }
+});
