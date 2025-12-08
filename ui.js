@@ -228,6 +228,16 @@ document.getElementById('structure-list').addEventListener('click', (e) => {
 
   const structureId = card.dataset.id;
   const cost        = parseInt(card.dataset.cost);
+  if (placementMode.active && placementMode.structureType === structureId) {
+    placementMode.active = false;
+    placementMode.structureType = null;
+    placementMode.previewX = -1;
+    placementMode.previewY = -1;
+    card.classList.remove('selected');
+    renderMap();
+    console.log('배치 모드 취소');
+    return;
+  }
   
   document.querySelectorAll('#structure-list .item-card').forEach(c => {
     c.classList.remove('selected');
