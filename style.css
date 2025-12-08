@@ -379,6 +379,12 @@ canvas{
   display:flex;
   align-items:center;
   justify-content:center;
+  cursor: pointer;   /* 클릭 가능한 UI임을 표시 */
+}
+
+/* 슬롯 내부 요소들이 클릭을 막지 않도록 */
+.production-slot * {
+  pointer-events: none;
 }
 
 /* 빈 슬롯일 때 표시되는 숫자 */
@@ -403,8 +409,7 @@ canvas{
   left:0;
   width:100%;
   height:100%;
-  transform:rotate(-90deg); /* 위(12시 방향)에서부터 진행되도록 회전 */
-  pointer-events:none;
+  transform:rotate(-90deg);
 }
 
 /* SVG 배경 원 */
@@ -423,13 +428,13 @@ canvas{
   transition:stroke-dashoffset 0.1s linear;
 }
 
-/* 생산 중인 슬롯 강조 스타일 */
+/* 생산 중인 슬롯 강조 */
 .production-slot.producing{
   border-color:#43b581;
   box-shadow:0 0 10px rgba(67,181,129,0.5);
 }
 
-/* 대기 중인 슬롯 강조 스타일 */
+/* 대기 중인 슬롯 강조 */
 .production-slot.waiting{
   border-color:#faa61a;
   opacity:0.8;
@@ -885,4 +890,32 @@ canvas{
 #sound-toggle-btn.sound-off:hover {
   background: #5d6670;
   transform: scale(1.05);
+}
+
+/* 라운드 미시작 경고 */
+@keyframes blink-round {
+  0%, 100% { color: #ffd700; }
+  50%      { color: #ff6b6b; }
+}
+
+.round-warning {
+  animation: blink-round 1s infinite;
+  position: relative;
+}
+
+.round-warning::after {
+  content: '라운드를 시작해야 유닛을 생산할 수 있어요! (Start Round 버튼)';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #f39c12;    /* 주황 */
+  color: #000;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
+  margin-top: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }

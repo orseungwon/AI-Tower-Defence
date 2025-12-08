@@ -128,8 +128,10 @@ document.addEventListener('keydown', (e) => {
 
 document.querySelectorAll('.unit-button').forEach(button => {
   button.addEventListener('click', () => {
-    if (!roundActive) return;
-
+    if (!roundActive) {
+       flashRoundWarning(2800);
+      return;
+    }
     const unitType = button.dataset.unit;
     const info     = unitInfo[unitType];
 
@@ -612,3 +614,67 @@ document.getElementById('help-modal').addEventListener('click', (e) => {
 document.getElementById("refresh-btn").addEventListener("click", () => {
   location.reload(true); // 페이지 즉시 새로고침
 });
+
+// 생산 대기열 슬롯 클릭 → 해당 유닛 제거(환불)
+document.getElementById('production-queue-container').addEventListener('click', (e) => {
+  // 슬롯 div를 찾음
+  const slot = e.target.closest('.production-slot');
+  if (!slot) return;
+  if (!selectedStructure || selectedStructureType !== 'barracks') return;
+
+  const barracks = selectedStructure;
+  const slotIndex = parseInt(slot.dataset.slot, 10); // 0=현재 생산, 1~2=대기
+
+  // 안전장치: 생산 구조 초기화 보장
+  if (!barracks.productionQueue) {
+    barracks.productionQueue = [];
+  }
+
+  // 0번 슬롯: 현재 생산 중인 유닛 취소(환불) + 다음 대기 유닛 바로 시작
+  if (slotIndex === 0) {
+    if (barracks.currentProduction) {
+      const item = barracks.currentProduction;
+      const refund = (item.cost != null) ? item.cost : unitInfo[item.type].cost;
+      gameState.resource += refund;                   // 자원 환불
+      soundManager.play('resource_structure');
+
+      // 현재 생산 취소
+      barracks.currentProduction  = null;
+      barracks.productionProgress = 0;
+      console.log('유닛 생산 취소');
+
+      // 대기열이 있으면 바로 다음 유닛 생산 시작
+      if (barracks.productionQueue.length > 0) {
+        barracks.currentProduction   = barracks.productionQueue.shift();
+        barracks.productionStartTime = Date.now();
+        barracks.productionProgress  = 0;
+      }
+
+      updateInfoPanel();
+      updateProductionQueueUI();
+    }
+    return;
+  }
+
+  // 1~2번 슬롯: 대기열 유닛 제거(환불)
+  const qIndex = slotIndex - 1; // 대기열 인덱스 보정
+  if (barracks.productionQueue[qIndex]) {
+    const item = barracks.productionQueue.splice(qIndex, 1)[0];
+    const refund = (item.cost != null) ? item.cost : unitInfo[item.type].cost;
+    gameState.resource += refund;                     // 자원 환불
+    soundManager.play('money');
+
+    updateInfoPanel();
+    updateProductionQueueUI();
+  }
+});
+
+// 라운드 경고 잠깐 표시
+function flashRoundWarning(ms = 1800) {
+  const roundValueEl = document.getElementById('round-value');
+  if (!roundValueEl) return;
+  roundValueEl.classList.add('round-warning');
+  // 효과음 있으면 한 줄 추가 가능: soundManager.play('round_end');
+  setTimeout(() => roundValueEl.classList.remove('round-warning'), ms);
+}
+
