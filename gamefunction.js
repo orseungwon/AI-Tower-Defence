@@ -828,6 +828,11 @@ function spawnUnit(barracks, unitData, owner) {
   // 시작 방향 결정
   let flipX;
   if (owner === 'ai') {
+    if (spawnGx === 13) {
+    flipX = false;
+  } else {
+    flipX = true;
+  }
     flipX = true;
   } else {
     let passedFlips = 0;
