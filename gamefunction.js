@@ -142,18 +142,24 @@ function drawUnit(unit) {
    1-3. 맵 렌더링 (메인)
    ───────────────────────────────────────────────────────────────────────────── */
 function renderMap() {
-  // 캔버스 전체 지우기
-  ctx.clearRect(0, 0, cv.width, cv.height);
-
-  const tileMap = ['dark_grass', 'grass', 'road'];
-  
-  // 1. 기본 타일 레이어
-  for (let y = 0; y < MAP_HEIGHT; y++) {
-    for (let x = 0; x < MAP_WIDTH; x++) {
-      const tileId = mapData[y][x];
-      drawTile(tileMap[tileId], x * TILE, y * TILE);
+  // 배경 캐싱 (최초 1회만)
+  if (!bgCached) {
+    const tileMap = ['dark_grass', 'grass', 'road'];
+    for (let y = 0; y < MAP_HEIGHT; y++) {
+      for (let x = 0; x < MAP_WIDTH; x++) {
+        const tileId = mapData[y][x];
+        const img = images[tileMap[tileId]];
+        if (img && img.complete) {
+          bgCtx.drawImage(img, x * TILE, y * TILE, TILE, TILE);
+        }
+      }
     }
+    bgCached = true;
+    console.log('배경 캐싱 완료');
   }
+
+  // 캐싱된 배경 복사
+  ctx.drawImage(bgCanvas, 0, 0);
   
   // 2. 기지 타일 오버레이 + HP 바
   bases.forEach(base => {

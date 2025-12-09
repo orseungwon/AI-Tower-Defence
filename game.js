@@ -49,6 +49,12 @@
 
 const cv  = document.getElementById('cv');
 const ctx = cv.getContext('2d');
+// 배경 캐싱용 캔버스
+const bgCanvas = document.createElement('canvas');
+bgCanvas.width = 960;
+bgCanvas.height = 640;
+const bgCtx = bgCanvas.getContext('2d');
+let bgCached = false;
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -321,13 +327,23 @@ function initializeUI() {
 // deltaTime 최대값 (100ms = 0.1초)
 // 탭 최소화 후 복귀 시 유닛이 순간이동하는 것을 방지
 const MAX_DELTA_TIME = 100;
+const TARGET_FPS = 30;
+const FRAME_INTERVAL = 1000 / TARGET_FPS;
 
 function gameLoop() {
   if (!gameLoopRunning) return;
 
   const currentTime = Date.now();
-  let deltaTime = currentTime - lastUpdateTime;
-  lastUpdateTime = currentTime;
+  const elapsed = currentTime - lastUpdateTime;
+  
+  // 30fps 제한
+  if (elapsed < FRAME_INTERVAL) {
+    requestAnimationFrame(gameLoop);
+    return;
+  }
+  
+  let deltaTime = elapsed;
+  lastUpdateTime = currentTime - (elapsed % FRAME_INTERVAL);
 
   // deltaTime 상한선 적용 (탭 비활성화 후 복귀 시 큰 값 방지)
   if (deltaTime > MAX_DELTA_TIME) {
