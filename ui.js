@@ -1,12 +1,54 @@
-// ========================
-// 마우스 / 입력 처리
-// ========================
+/* ╔═══════════════════════════════════════════════════════════════════════════╗
+   ║                         AI TOWER DEFENCE                                  ║
+   ║                       UI.JS - 사용자 입력 처리                              ║
+   ╚═══════════════════════════════════════════════════════════════════════════╝ */
+   /*
+    1. 마우스 / 키보드 입력 처리
+    ├─ 1-1. 마우스 이동 이벤트
+    ├─ 1-2. 마우스가 캔버스를 벗어났을 때
+    ├─ 1-3. 캔버스 클릭 이벤트
+    └─ 1-4. ESC 키 처리
+
+    2. 유닛 생산
+      ├─ 2-1. 유닛 생산 버튼 처리
+      ├─ 2-2. 생산 큐 UI 렌더링
+      ├─ 2-3. 슬롯 콘텐츠 생성
+      └─ 2-4. 생산 대기열 슬롯 클릭 (유닛 취소/환불)
+
+    3. 건설 메뉴 / 구조물 판매
+      ├─ 3-1. 건설 메뉴 클릭
+      └─ 3-2. 구조물 판매
+
+    4. 라운드 컨트롤
+      ├─ 4-1. 라운드 시작 버튼
+      ├─ 4-2. 게임 초기화 버튼
+      ├─ 4-3. 페이지 새로고침 버튼
+      └─ 4-4. 라운드 경고 플래시
+
+    5. Claude API 연동
+      ├─ 5-1. API 키 관리
+      ├─ 5-2. API 키 검증
+      ├─ 5-3. API 키 모달 처리
+      └─ 5-4. Claude API 호출
+
+    6. 도움말 모달
+      ├─ 6-1. 도움말 열기/닫기
+      ├─ 6-2. 탭 전환
+      └─ 6-3. 모달 바깥 클릭시 닫기
+   */
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1. 마우스 / 키보드 입력 처리
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 // 마우스가 가리키는 타일 좌표 (그리드 기준)
 let mouseGridX = -1;
 let mouseGridY = -1;
 
-// 마우스 이동 이벤트
+/* ─────────────────────────────────────────────────────────────────────────────
+   1-1. 마우스 이동 이벤트
+   ───────────────────────────────────────────────────────────────────────────── */
 cv.addEventListener('mousemove', (e) => {
   const rect   = cv.getBoundingClientRect();
   const mouseX = e.clientX - rect.left;
@@ -22,7 +64,9 @@ cv.addEventListener('mousemove', (e) => {
   }
 });
 
-// 마우스가 캔버스를 벗어났을 때
+/* ─────────────────────────────────────────────────────────────────────────────
+   1-2. 마우스가 캔버스를 벗어났을 때
+   ───────────────────────────────────────────────────────────────────────────── */
 cv.addEventListener('mouseleave', () => {
   if (placementMode.active) {
     placementMode.previewX = -1;
@@ -31,7 +75,9 @@ cv.addEventListener('mouseleave', () => {
   }
 });
 
-// 캔버스 클릭 이벤트
+/* ─────────────────────────────────────────────────────────────────────────────
+   1-3. 캔버스 클릭 이벤트
+   ───────────────────────────────────────────────────────────────────────────── */
 cv.addEventListener('click', (e) => {
   const rect   = cv.getBoundingClientRect();
   const clickX = e.clientX - rect.left;
@@ -54,9 +100,8 @@ cv.addEventListener('click', (e) => {
   // 2) 배치 모드가 아닌 경우
   function showBuildMenu() {
     structurePanel.classList.remove('active');
-    document.getElementById('structure-list').style.display   = 'block';
-    //document.getElementById('round-controls').style.display   = 'block';
-    document.getElementById('sidebar-header').textContent     = '건설 메뉴';
+    document.getElementById('structure-list').style.display = 'block';
+    document.getElementById('sidebar-header').textContent   = '건설 메뉴';
     selectedStructure     = null;
     selectedStructureType = null;
     renderMap();
@@ -82,17 +127,17 @@ cv.addEventListener('click', (e) => {
     structurePanel.classList.add('active');
 
     const info = structureInfo[clickedType];
-    document.getElementById('sidebar-header').textContent        = '구조물 상세';
+    document.getElementById('sidebar-header').textContent         = '구조물 상세';
     document.getElementById('structure-panel-header').textContent = info.name;
-    document.getElementById('structure-name').textContent        = info.name;
-    document.getElementById('structure-description').textContent = info.description;
+    document.getElementById('structure-name').textContent         = info.name;
+    document.getElementById('structure-description').textContent  = info.description;
 
     if (clickedType === 'barracks') {
-      document.getElementById('unit-production').style.display           = 'block';
+      document.getElementById('unit-production').style.display            = 'block';
       document.getElementById('production-queue-container').style.display = 'block';
       updateProductionQueueUI();
     } else {
-      document.getElementById('unit-production').style.display           = 'none';
+      document.getElementById('unit-production').style.display            = 'none';
       document.getElementById('production-queue-container').style.display = 'none';
     }
 
@@ -102,14 +147,16 @@ cv.addEventListener('click', (e) => {
   }
 });
 
-// ESC 키 처리
+/* ─────────────────────────────────────────────────────────────────────────────
+   1-4. ESC 키 처리
+   ───────────────────────────────────────────────────────────────────────────── */
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     if (placementMode.active) {
-      placementMode.active       = false;
+      placementMode.active        = false;
       placementMode.structureType = null;
-      placementMode.previewX     = -1;
-      placementMode.previewY     = -1;
+      placementMode.previewX      = -1;
+      placementMode.previewY      = -1;
       
       document.querySelectorAll('#structure-list .item-card').forEach(c => {
         c.classList.remove('selected');
@@ -122,22 +169,26 @@ document.addEventListener('keydown', (e) => {
 });
 
 
-// ========================
-// 유닛 생산 버튼 처리
-// ========================
+/* ═══════════════════════════════════════════════════════════════════════════
+   2. 유닛 생산
+   ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   2-1. 유닛 생산 버튼 처리
+   ───────────────────────────────────────────────────────────────────────────── */
 document.querySelectorAll('.unit-button').forEach(button => {
   button.addEventListener('click', () => {
     if (!roundActive) {
-       flashRoundWarning(2800);
+      flashRoundWarning(2800);
       return;
     }
+    
     const unitType = button.dataset.unit;
     const info     = unitInfo[unitType];
 
     if (!selectedStructure.productionQueue) {
-      selectedStructure.productionQueue   = [];
-      selectedStructure.currentProduction = null;
+      selectedStructure.productionQueue    = [];
+      selectedStructure.currentProduction  = null;
       selectedStructure.productionProgress = 0;
     }
     
@@ -160,17 +211,15 @@ document.querySelectorAll('.unit-button').forEach(button => {
   });
 });
 
-
-// ========================
-// 생산 큐 UI 렌더링
-// ========================
-
+/* ─────────────────────────────────────────────────────────────────────────────
+   2-2. 생산 큐 UI 렌더링
+   ───────────────────────────────────────────────────────────────────────────── */
 function updateProductionQueueUI() {
   if (!selectedStructure || selectedStructureType !== 'barracks') return;
   
   if (!selectedStructure.productionQueue) {
-    selectedStructure.productionQueue   = [];
-    selectedStructure.currentProduction = null;
+    selectedStructure.productionQueue    = [];
+    selectedStructure.currentProduction  = null;
     selectedStructure.productionProgress = 0;
   }
   
@@ -199,6 +248,9 @@ function updateProductionQueueUI() {
   });
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   2-3. 슬롯 콘텐츠 생성
+   ───────────────────────────────────────────────────────────────────────────── */
 function createSlotContent(unitType, progress) {
   const circumference = 2 * Math.PI * 31;
   const offset        = circumference * (1 - progress);
@@ -219,22 +271,80 @@ function createSlotContent(unitType, progress) {
   `;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   2-4. 생산 대기열 슬롯 클릭 (유닛 취소/환불)
+   ───────────────────────────────────────────────────────────────────────────── */
+document.getElementById('production-queue-container').addEventListener('click', (e) => {
+  const slot = e.target.closest('.production-slot');
+  if (!slot) return;
+  if (!selectedStructure || selectedStructureType !== 'barracks') return;
 
-// ========================
-// 건설 메뉴 / 구조물 판매 / 라운드 컨트롤
-// ========================
+  const barracks  = selectedStructure;
+  const slotIndex = parseInt(slot.dataset.slot, 10);
 
+  if (!barracks.productionQueue) {
+    barracks.productionQueue = [];
+  }
+
+  // 0번 슬롯: 현재 생산 중인 유닛 취소
+  if (slotIndex === 0) {
+    if (barracks.currentProduction) {
+      const item   = barracks.currentProduction;
+      const refund = (item.cost != null) ? item.cost : unitInfo[item.type].cost;
+      gameState.resource += refund;
+      soundManager.play('resource_structure');
+
+      barracks.currentProduction  = null;
+      barracks.productionProgress = 0;
+      console.log('유닛 생산 취소');
+
+      // 대기열이 있으면 바로 다음 유닛 생산 시작
+      if (barracks.productionQueue.length > 0) {
+        barracks.currentProduction   = barracks.productionQueue.shift();
+        barracks.productionStartTime = Date.now();
+        barracks.productionProgress  = 0;
+      }
+
+      updateInfoPanel();
+      updateProductionQueueUI();
+    }
+    return;
+  }
+
+  // 1~2번 슬롯: 대기열 유닛 제거
+  const qIndex = slotIndex - 1;
+  if (barracks.productionQueue[qIndex]) {
+    const item   = barracks.productionQueue.splice(qIndex, 1)[0];
+    const refund = (item.cost != null) ? item.cost : unitInfo[item.type].cost;
+    gameState.resource += refund;
+    soundManager.play('money');
+
+    updateInfoPanel();
+    updateProductionQueueUI();
+  }
+});
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3. 건설 메뉴 / 구조물 판매
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   3-1. 건설 메뉴 클릭
+   ───────────────────────────────────────────────────────────────────────────── */
 document.getElementById('structure-list').addEventListener('click', (e) => {
   const card = e.target.closest('.item-card');
   if (!card) return;
 
   const structureId = card.dataset.id;
   const cost        = parseInt(card.dataset.cost);
+  
+  // 같은 카드 다시 클릭하면 배치 모드 취소
   if (placementMode.active && placementMode.structureType === structureId) {
-    placementMode.active = false;
+    placementMode.active        = false;
     placementMode.structureType = null;
-    placementMode.previewX = -1;
-    placementMode.previewY = -1;
+    placementMode.previewX      = -1;
+    placementMode.previewY      = -1;
     card.classList.remove('selected');
     renderMap();
     console.log('배치 모드 취소');
@@ -247,11 +357,11 @@ document.getElementById('structure-list').addEventListener('click', (e) => {
   
   card.classList.add('selected');
   
-  placementMode.active       = true;
+  placementMode.active        = true;
   placementMode.structureType = structureId;
-  placementMode.cost         = cost;
-  placementMode.previewX     = mouseGridX;
-  placementMode.previewY     = mouseGridY;
+  placementMode.cost          = cost;
+  placementMode.previewX      = mouseGridX;
+  placementMode.previewY      = mouseGridY;
   
   structurePanel.classList.remove('active');
   selectedStructure     = null;
@@ -261,9 +371,14 @@ document.getElementById('structure-list').addEventListener('click', (e) => {
   renderMap();
 });
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   3-2. 구조물 판매
+   ───────────────────────────────────────────────────────────────────────────── */
 document.getElementById('sell-structure').addEventListener('click', () => {
   if (!selectedStructure || !selectedStructureType) return;
+  
   soundManager.play('resource_structure');
+  
   const targetGx = selectedStructure.gx;
   const targetGy = selectedStructure.gy;
   
@@ -279,7 +394,7 @@ document.getElementById('sell-structure').addEventListener('click', () => {
   structures.player[selectedStructureType].splice(index, 1);
   
   const refund = Math.floor(structureInfo[selectedStructureType].cost * 0.5);
-  gameState.resource      += refund;
+  gameState.resource       += refund;
   gameState.structureCount--;
   
   if (selectedStructureType === 'population') {
@@ -295,41 +410,35 @@ document.getElementById('sell-structure').addEventListener('click', () => {
   renderMap();
 });
 
-// 라운드 시작 버튼 - async 함수로 정의
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4. 라운드 컨트롤
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   4-1. 라운드 시작 버튼
+   ───────────────────────────────────────────────────────────────────────────── */
 document.getElementById('start-round-btn').addEventListener('click', async () => {
   roundActive = true;
   document.getElementById('start-round-btn').disabled = true;
-  //document.getElementById('stop-round-btn').disabled  = false;
 
-  // Claude AI 전략 요청 (없으면 기본 AI)
   saveRoundState();
-
   await requestAIStrategy();
-  
-  
   startRound();
 
   console.log('라운드 시작!');
 });
 
-// 라운드 정지 버튼
-// document.getElementById('stop-round-btn').addEventListener('click', () => {
-//   roundActive = false;
-//   document.getElementById('start-round-btn').disabled = false;
-//   document.getElementById('stop-round-btn').disabled  = true;
-  
-//   console.log('라운드 중지!');
-// });
-
-// 게임 초기화 버튼
+/* ─────────────────────────────────────────────────────────────────────────────
+   4-2. 게임 초기화 버튼
+   ───────────────────────────────────────────────────────────────────────────── */
 document.getElementById('reset-game-btn').addEventListener('click', () => {
   resetGameState();
   localStorage.removeItem('roundSave');
 
   structurePanel.classList.remove('active');
-  document.getElementById('structure-list').style.display   = 'block';
-  //document.getElementById('round-controls').style.display   = 'block';
-  document.getElementById('sidebar-header').textContent     = '건설 메뉴';
+  document.getElementById('structure-list').style.display = 'block';
+  document.getElementById('sidebar-header').textContent   = '건설 메뉴';
   selectedStructure     = null;
   selectedStructureType = null;
   
@@ -337,47 +446,54 @@ document.getElementById('reset-game-btn').addEventListener('click', () => {
   updateInfoPanel();
   
   console.log('게임 초기화 완료');
-   location.reload(true);
-
+  location.reload(true);
 });
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   4-3. 페이지 새로고침 버튼
+   ───────────────────────────────────────────────────────────────────────────── */
+document.getElementById("refresh-btn").addEventListener("click", () => {
+  location.reload(true);
+});
 
-// ========================
-// Claude API 직접 호출 (브라우저)
-// ========================
+/* ─────────────────────────────────────────────────────────────────────────────
+   4-4. 라운드 경고 플래시
+   ───────────────────────────────────────────────────────────────────────────── */
+function flashRoundWarning(ms = 1800) {
+  const roundValueEl = document.getElementById('round-value');
+  if (!roundValueEl) return;
+  
+  roundValueEl.classList.add('round-warning');
+  soundManager.play('remove_melee');
+  
+  setTimeout(() => roundValueEl.classList.remove('round-warning'), ms);
+}
 
-// API 키 저장/불러오기
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. Claude API 연동
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   5-1. API 키 관리
+   ───────────────────────────────────────────────────────────────────────────── */
 function getApiKey() {
   return localStorage.getItem('claude_api_key') || '';
 }
-
-// function setApiKey(key) {
-//   if (!key || key.trim() === "") {
-//     localStorage.removeItem('claude_api_key');
-//   } else {
-//     localStorage.setItem('claude_api_key', key.trim());
-//   }
-//   updateApiStatus();
-// }
 
 function setApiKey(key) {
   const trimmed = key.trim();
 
   if (!trimmed) {
-    // 공백 또는 빈 문자열 → 키 삭제
     localStorage.removeItem('claude_api_key');
     console.log("API 키 삭제됨");
   } else {
-    // 정상적인 키 저장
     localStorage.setItem('claude_api_key', trimmed);
     console.log("API 키 저장됨:", trimmed);
   }
 
-  updateApiStatus(); // UI 즉시 업데이트
+  updateApiStatus();
 }
-
-
-
 
 function updateApiStatus() {
   const status = document.getElementById('api-status');
@@ -385,83 +501,70 @@ function updateApiStatus() {
   
   if (getApiKey()) {
     status.textContent = 'AI ON';
-    status.className = 'connected';
+    status.className   = 'connected';
   } else {
     status.textContent = 'AI OFF';
-    status.className = 'disconnected';
+    status.className   = 'disconnected';
   }
 }
 
-// API 키 모달 처리 - 페이지 로드 후 실행
-// window.addEventListener('DOMContentLoaded', () => {
-//   const saveBtn = document.getElementById('save-api-key-btn');
-//   const skipBtn = document.getElementById('skip-api-key-btn');
-//   const changeBtn = document.getElementById('change-api-key-btn');
-//   const modal = document.getElementById('api-key-modal');
-//   const input = document.getElementById('api-key-input');
+/* ─────────────────────────────────────────────────────────────────────────────
+   5-2. API 키 검증
+   ───────────────────────────────────────────────────────────────────────────── */
+async function validateApiKey(key) {
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 5,
+        messages: [{ role: "user", content: "ping" }]
+      })
+    });
 
-//   if (saveBtn) {
-//     saveBtn.addEventListener('click', () => {
-//       const key = input.value.trim();
-//       setApiKey(key);
-//       if (modal) modal.classList.add('hidden');
-//       console.log('API 키 저장됨');
-//     });
-//   }
+    return response.ok;
+  } catch (e) {
+    return false;
+  }
+}
 
-//   if (skipBtn) {
-//     skipBtn.addEventListener('click', () => {
-//       if (modal) modal.classList.add('hidden');
-//       console.log('API 키 건너뜀 - 기본 AI 사용');
-//     });
-//   }
-
-//   if (changeBtn) {
-//     changeBtn.addEventListener('click', () => {
-//       if (input) input.value = getApiKey();
-//       if (modal) modal.classList.remove('hidden');
-//     });
-//   }
-
-//   // 초기 상태 설정
-//   updateApiStatus();
-  
-//   // 이미 API 키가 있으면 모달 숨기기
-//   if (getApiKey() && modal) {
-//     modal.classList.add('hidden');
-//   }
-// });
-
+/* ─────────────────────────────────────────────────────────────────────────────
+   5-3. API 키 모달 처리
+   ───────────────────────────────────────────────────────────────────────────── */
 window.addEventListener('DOMContentLoaded', () => {
-  const saveBtn = document.getElementById('save-api-key-btn');
-  const skipBtn = document.getElementById('skip-api-key-btn');
+  const saveBtn   = document.getElementById('save-api-key-btn');
+  const skipBtn   = document.getElementById('skip-api-key-btn');
   const changeBtn = document.getElementById('change-api-key-btn');
-  const modal = document.getElementById('api-key-modal');
-  const input = document.getElementById('api-key-input');
+  const modal     = document.getElementById('api-key-modal');
+  const input     = document.getElementById('api-key-input');
 
-  // 👉 수정된 save 버튼 (API 키 검증)
+  // 저장 버튼 (API 키 검증 후 저장)
   if (saveBtn) {
     saveBtn.addEventListener("click", async () => {
-      const key = input.value.trim();
-       // 🔥 validate 실행
-  const valid = await validateApiKey(key);
+      const key   = input.value.trim();
+      const valid = await validateApiKey(key);
 
-  if (!valid) {
-    alert("API 키가 유효하지 않습니다! 기본 AI로 전환됩니다.");
-    localStorage.removeItem("claude_api_key");
-    updateApiStatus();
-    modal.classList.add("hidden");
-    return;
+      if (!valid) {
+        alert("API 키가 유효하지 않습니다! 기본 AI로 전환됩니다.");
+        localStorage.removeItem("claude_api_key");
+        updateApiStatus();
+        modal.classList.add("hidden");
+        return;
+      }
+
+      setApiKey(key);
+      modal.classList.add("hidden");
+      console.log("API 키 검증 완료 → 저장됨");
+    });
   }
 
-  // 🔥 정상적인 키일 때만 저장
-  setApiKey(key);
-  modal.classList.add("hidden");
-  console.log("API 키 검증 완료 → 저장됨");
-});
-  }
-
-  // 기존 skip 버튼
+  // 건너뛰기 버튼
   if (skipBtn) {
     skipBtn.addEventListener('click', () => {
       modal.classList.add('hidden');
@@ -469,23 +572,22 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 기존 change 버튼 
-  if (changeBtn) { changeBtn.addEventListener('click', () => {
-     input.value = getApiKey();
-     modal.classList.remove('hidden');
-     });
-     }
-
-
+  // API 설정 변경 버튼
+  if (changeBtn) {
+    changeBtn.addEventListener('click', () => {
+      input.value = getApiKey();
+      modal.classList.remove('hidden');
+    });
+  }
 
   // 초기 상태 설정
   updateApiStatus();
-
   if (getApiKey()) modal.classList.add('hidden');
 });
 
-
-// Claude API 호출
+/* ─────────────────────────────────────────────────────────────────────────────
+   5-4. Claude API 호출 (AI 전략 요청)
+   ───────────────────────────────────────────────────────────────────────────── */
 async function requestAIStrategy() {
   const apiKey = getApiKey();
   
@@ -495,13 +597,11 @@ async function requestAIStrategy() {
     generateAIUnits();
     console.log('기본 ai 유닛 생성');
     return applyAIStrategy(applyDefaultAIStrategy());
-
-    
   }
 
-  const state = collectGameState();
-  
+  const state  = collectGameState();
   const prompt = buildAIPrompt(state);
+  
   try {
     console.log('📡 Claude API 호출 중...');
     
@@ -525,13 +625,11 @@ async function requestAIStrategy() {
       console.error('API 오류:', error);
       console.log('기본 AI로 대체');
       generateAIUnits();
-
       return applyAIStrategy(applyDefaultAIStrategy());
-
     }
 
     const data = await response.json();
-    const raw = data.content[0].text.trim();
+    const raw  = data.content[0].text.trim();
     console.log('Claude 응답:', raw);
 
     try {
@@ -542,47 +640,23 @@ async function requestAIStrategy() {
       console.error('JSON 파싱 실패:', parseError);
       generateAIUnits();
       return applyAIStrategy(applyDefaultAIStrategy());
-
-
     }
 
   } catch (err) {
     console.error('❌ API 호출 실패:', err);
     generateAIUnits();
     return applyAIStrategy(applyDefaultAIStrategy());
-
-
-  }
-}
-
-async function validateApiKey(key) {
-  try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": key,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true"
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 5,
-        messages: [{ role: "user", content: "ping" }]
-      })
-    });
-
-    return response.ok; // 200~299이면 true
-  } catch (e) {
-    return false;
   }
 }
 
 
-// ========================
-// 도움말 모달 처리
-// ========================
+/* ═══════════════════════════════════════════════════════════════════════════
+   6. 도움말 모달
+   ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   6-1. 도움말 열기/닫기
+   ───────────────────────────────────────────────────────────────────────────── */
 document.getElementById('help-btn').addEventListener('click', () => {
   document.getElementById('help-modal').classList.remove('hidden');
 });
@@ -591,7 +665,9 @@ document.getElementById('close-help-btn').addEventListener('click', () => {
   document.getElementById('help-modal').classList.add('hidden');
 });
 
-// 탭 전환
+/* ─────────────────────────────────────────────────────────────────────────────
+   6-2. 탭 전환
+   ───────────────────────────────────────────────────────────────────────────── */
 document.querySelectorAll('.help-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     const tabName = tab.dataset.tab;
@@ -606,77 +682,11 @@ document.querySelectorAll('.help-tab').forEach(tab => {
   });
 });
 
-// 모달 바깥 클릭시 닫기
+/* ─────────────────────────────────────────────────────────────────────────────
+   6-3. 모달 바깥 클릭시 닫기
+   ───────────────────────────────────────────────────────────────────────────── */
 document.getElementById('help-modal').addEventListener('click', (e) => {
   if (e.target.id === 'help-modal') {
     document.getElementById('help-modal').classList.add('hidden');
   }
 });
-
-document.getElementById("refresh-btn").addEventListener("click", () => {
-  location.reload(true); // 페이지 즉시 새로고침
-});
-
-// 생산 대기열 슬롯 클릭 → 해당 유닛 제거(환불)
-document.getElementById('production-queue-container').addEventListener('click', (e) => {
-  // 슬롯 div를 찾음
-  const slot = e.target.closest('.production-slot');
-  if (!slot) return;
-  if (!selectedStructure || selectedStructureType !== 'barracks') return;
-
-  const barracks = selectedStructure;
-  const slotIndex = parseInt(slot.dataset.slot, 10); // 0=현재 생산, 1~2=대기
-
-  // 안전장치: 생산 구조 초기화 보장
-  if (!barracks.productionQueue) {
-    barracks.productionQueue = [];
-  }
-
-  // 0번 슬롯: 현재 생산 중인 유닛 취소(환불) + 다음 대기 유닛 바로 시작
-  if (slotIndex === 0) {
-    if (barracks.currentProduction) {
-      const item = barracks.currentProduction;
-      const refund = (item.cost != null) ? item.cost : unitInfo[item.type].cost;
-      gameState.resource += refund;                   // 자원 환불
-      soundManager.play('resource_structure');
-
-      // 현재 생산 취소
-      barracks.currentProduction  = null;
-      barracks.productionProgress = 0;
-      console.log('유닛 생산 취소');
-
-      // 대기열이 있으면 바로 다음 유닛 생산 시작
-      if (barracks.productionQueue.length > 0) {
-        barracks.currentProduction   = barracks.productionQueue.shift();
-        barracks.productionStartTime = Date.now();
-        barracks.productionProgress  = 0;
-      }
-
-      updateInfoPanel();
-      updateProductionQueueUI();
-    }
-    return;
-  }
-
-  // 1~2번 슬롯: 대기열 유닛 제거(환불)
-  const qIndex = slotIndex - 1; // 대기열 인덱스 보정
-  if (barracks.productionQueue[qIndex]) {
-    const item = barracks.productionQueue.splice(qIndex, 1)[0];
-    const refund = (item.cost != null) ? item.cost : unitInfo[item.type].cost;
-    gameState.resource += refund;                     // 자원 환불
-    soundManager.play('money');
-
-    updateInfoPanel();
-    updateProductionQueueUI();
-  }
-});
-
-// 라운드 경고 잠깐 표시
-function flashRoundWarning(ms = 1800) {
-  const roundValueEl = document.getElementById('round-value');
-  if (!roundValueEl) return;
-  roundValueEl.classList.add('round-warning');
-  soundManager.play('remove_melee');
-  setTimeout(() => roundValueEl.classList.remove('round-warning'), ms);
-}
-

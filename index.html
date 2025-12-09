@@ -2,18 +2,25 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=1024">
   <title>AI Tower Defence</title>
-  <!-- 전체 게임 화면에 적용되는 공통 스타일 시트 -->
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <!-- API 키 입력 모달 -->
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       API 키 입력 모달
+       - Claude API 키를 입력받아 AI 전략 플레이 활성화
+       - 키 미입력 시 기본 AI로 동작
+       ═══════════════════════════════════════════════════════════════════════ -->
   <div id="api-key-modal">
     <div class="modal-content">
       <h2>🤖 AI Tower Defence</h2>
-      <p>Claude API 키를 입력하면 AI가 전략적으로 플레이합니다.<br>
-         키가 없으면 기본 AI로 플레이됩니다.</p>
+      <p>
+        Claude API 키를 입력하면 AI가 전략적으로 플레이합니다.<br>
+        키가 없으면 기본 AI로 플레이됩니다.
+      </p>
       <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." />
       <div>
         <button id="save-api-key-btn">API 키 저장</button>
@@ -24,215 +31,216 @@
       </p>
     </div>
   </div>
-  <!-- 게임 설명 모달 -->
-<div id="help-modal" class="hidden">
-  <div class="modal-content help-modal-content">
-    <h2>📖 게임 설명서</h2>
-    
-    <div class="help-tabs">
-      <button class="help-tab active" data-tab="goal">목표</button>
-      <button class="help-tab" data-tab="structures">구조물</button>
-      <button class="help-tab" data-tab="units">유닛</button>
-      <button class="help-tab" data-tab="controls">조작법</button>
-    </div>
-    
-    <div class="help-content">
-      <div class="help-section active" data-section="goal">
-        <h3>🎯 게임 목표</h3>
-        <p>상대방(AI) 기지를 파괴하면 <span class="highlight">승리!</span></p>
-        <p>내 기지가 파괴되면 <span class="highlight red">패배!</span></p>
-        <h3>⚙️ 기본 시스템</h3>
-        <ul>
-          <li><b>라운드제:</b> Start Round 버튼으로 시작</li>
-          <li><b>자원:</b> 매 라운드 50 지급 + 자원생산소 보너스</li>
-          <li><b>인구수:</b> 유닛 생산에 필요, 주거지로 증가</li>
-          <li><b>구조물:</b> 최대 10개까지 건설 가능</li>
-        </ul>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       게임 설명 모달
+       - 목표, 구조물, 유닛, 조작법 탭으로 구성
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div id="help-modal" class="hidden">
+    <div class="modal-content help-modal-content">
+      <h2>📖 게임 설명서</h2>
+
+      <!-- 탭 버튼 -->
+      <div class="help-tabs">
+        <button class="help-tab active" data-tab="goal">목표</button>
+        <button class="help-tab" data-tab="structures">구조물</button>
+        <button class="help-tab" data-tab="units">유닛</button>
+        <button class="help-tab" data-tab="controls">조작법</button>
       </div>
-      
-      <div class="help-section" data-section="structures">
-        <h3>🏗️ 구조물</h3>
-        <div class="help-table">
-          <div class="help-row">
-            <img src="images/structure_barracks.png" class="help-icon">
-            <div><b>병영 (20)</b><br>유닛을 생산합니다</div>
-          </div>
-          <div class="help-row">
-            <img src="images/structure_population.png" class="help-icon">
-            <div><b>주거지 (20)</b><br>최대 인구수 +3</div>
-          </div>
-          <div class="help-row">
-            <img src="images/structure_turret.png" class="help-icon">
-            <div><b>포탑 (20)</b><br>길 위의 적을 자동 공격</div>
-          </div>
-          <div class="help-row">
-            <img src="images/structure_resource.png" class="help-icon">
-            <div><b>자원생산소 (30)</b><br>라운드당 자원 +20</div>
+
+      <!-- 탭 콘텐츠 -->
+      <div class="help-content">
+
+        <!-- 목표 탭 -->
+        <div class="help-section active" data-section="goal">
+          <h3>🎯 게임 목표</h3>
+          <p>상대방(AI) 기지를 파괴하면 <span class="highlight">승리!</span></p>
+          <p>내 기지가 파괴되면 <span class="highlight red">패배!</span></p>
+
+          <h3>⚙️ 기본 시스템</h3>
+          <ul>
+            <li><b>라운드제:</b> Start Round 버튼으로 시작</li>
+            <li><b>자원:</b> 매 라운드 50 지급 + 자원생산소 보너스</li>
+            <li><b>인구수:</b> 유닛 생산에 필요, 주거지로 증가</li>
+            <li><b>구조물:</b> 최대 10개까지 건설 가능</li>
+          </ul>
+        </div>
+
+        <!-- 구조물 탭 -->
+        <div class="help-section" data-section="structures">
+          <h3>🏗️ 구조물</h3>
+          <div class="help-table">
+            <div class="help-row">
+              <img src="images/structure_barracks.png" class="help-icon">
+              <div><b>병영 (20)</b><br>유닛을 생산합니다</div>
+            </div>
+            <div class="help-row">
+              <img src="images/structure_population.png" class="help-icon">
+              <div><b>주거지 (20)</b><br>최대 인구수 +3</div>
+            </div>
+            <div class="help-row">
+              <img src="images/structure_turret.png" class="help-icon">
+              <div><b>포탑 (20)</b><br>길 위의 적을 자동 공격</div>
+            </div>
+            <div class="help-row">
+              <img src="images/structure_resource.png" class="help-icon">
+              <div><b>자원생산소 (30)</b><br>라운드당 자원 +20</div>
+            </div>
           </div>
         </div>
-      </div>
-      
-      <div class="help-section" data-section="units">
-        <h3>⚔️ 유닛</h3>
-        <div class="help-table">
-          <div class="help-row">
-            <img src="images/unit_melee_move_1.png" class="help-icon">
-            <div><b>근접 유닛 (5)</b><br>체력 높음, 근거리 공격</div>
+
+        <!-- 유닛 탭 -->
+        <div class="help-section" data-section="units">
+          <h3>⚔️ 유닛</h3>
+          <div class="help-table">
+            <div class="help-row">
+              <img src="images/unit_melee_move_1.png" class="help-icon">
+              <div><b>근접 유닛 (5)</b><br>체력 높음, 근거리 공격</div>
+            </div>
+            <div class="help-row">
+              <img src="images/unit_ranged_move_1.png" class="help-icon">
+              <div><b>원거리 유닛 (5)</b><br>긴 사거리, 낮은 체력</div>
+            </div>
+            <div class="help-row">
+              <img src="images/unit_tank_move_1.png" class="help-icon">
+              <div><b>탱크 유닛 (10)</b><br>매우 높은 체력, 느린 속도</div>
+            </div>
           </div>
-          <div class="help-row">
-            <img src="images/unit_ranged_move_1.png" class="help-icon">
-            <div><b>원거리 유닛 (5)</b><br>긴 사거리, 낮은 체력</div>
-          </div>
-          <div class="help-row">
-            <img src="images/unit_tank_move_1.png" class="help-icon">
-            <div><b>탱크 유닛 (10)</b><br>매우 높은 체력, 느린 속도</div>
-          </div>
+          <p class="help-tip">💡 탱크를 앞세우고 원거리가 뒤에서 공격하는 조합이 효과적!</p>
         </div>
-        <p class="help-tip">💡 탱크를 앞세우고 원거리가 뒤에서 공격하는 조합이 효과적!</p>
+
+        <!-- 조작법 탭 -->
+        <div class="help-section" data-section="controls">
+          <h3>🎮 조작법</h3>
+          <ul>
+            <li><b>구조물 건설:</b> 우측 메뉴에서 선택 → 맵 클릭</li>
+            <li><b>구조물 선택:</b> 맵의 구조물 클릭</li>
+            <li><b>유닛 생산:</b> 병영 선택 → 유닛 버튼 클릭</li>
+            <li><b>구조물 판매:</b> 구조물 선택 → 판매 버튼 (50% 환불)</li>
+            <li><b>취소:</b> ESC 키</li>
+          </ul>
+
+          <h3>🤖 AI 모드</h3>
+          <p>API 키 설정 시 Claude AI가 전략적으로 플레이합니다!</p>
+        </div>
+
       </div>
-      
-      <div class="help-section" data-section="controls">
-        <h3>🎮 조작법</h3>
-        <ul>
-          <li><b>구조물 건설:</b> 우측 메뉴에서 선택 → 맵 클릭</li>
-          <li><b>구조물 선택:</b> 맵의 구조물 클릭</li>
-          <li><b>유닛 생산:</b> 병영 선택 → 유닛 버튼 클릭</li>
-          <li><b>구조물 판매:</b> 구조물 선택 → 판매 버튼 (50% 환불)</li>
-          <li><b>취소:</b> ESC 키</li>
-        </ul>
-        <h3>🤖 AI 모드</h3>
-        <p>API 키 설정 시 Claude AI가 전략적으로 플레이합니다!</p>
-      </div>
+
+      <button id="close-help-btn">닫기</button>
     </div>
-    
-    <button id="close-help-btn">닫기</button>
   </div>
-</div>
-  <!-- 게임 전체를 감싸는 최상위 컨테이너 -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       게임 메인 래퍼
+       ═══════════════════════════════════════════════════════════════════════ -->
   <div id="game-wrapper">
 
-<div id="top-info-panel">
+    <!-- ─────────────────────────────────────────────────────────────────────
+         상단 정보 패널
+         - 게임 제어 버튼 (좌측)
+         - 게임 상태 정보 (우측)
+         ───────────────────────────────────────────────────────────────────── -->
+    <div id="top-info-panel">
 
-  <!-- 왼쪽 버튼 그룹 -->
-  <div id="top-button-group">
-<button id="reset-game-btn" class="top-btn reset-btn">Game Reset</button>
-<button id="refresh-btn" class="top-btn primary-btn">Round Refresh</button>
-<button id="sound-toggle-btn" class="top-btn secondary-btn">Sound</button>
-<button id="help-btn" class="top-btn primary-btn">?</button>
-<button id="change-api-key-btn" class="top-btn primary-btn">API Settings</button>
-<span id="api-status" class="top-btn secondary-btn">AI ON</span>
+      <!-- 좌측: 버튼 그룹 -->
+      <div id="top-button-group">
+        <button id="reset-game-btn" class="top-btn reset-btn">Game Reset</button>
+        <button id="refresh-btn" class="top-btn primary-btn">Round Refresh</button>
+        <button id="sound-toggle-btn" class="top-btn secondary-btn">Sound</button>
+        <button id="help-btn" class="top-btn primary-btn">?</button>
+        <button id="change-api-key-btn" class="top-btn primary-btn">API Settings</button>
+        <span id="api-status" class="top-btn secondary-btn">AI ON</span>
+      </div>
 
-  </div>
+      <!-- 우측: 정보 그룹 -->
+      <div id="top-info-group">
+        <div class="info-item">
+          <span class="info-label">라운드</span>
+          <span class="info-value" id="round-value">1</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">자원</span>
+          <span class="info-value" id="resource-value">10</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">인구수</span>
+          <span class="info-value" id="population-value">0 / 3</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">건물</span>
+          <span class="info-value" id="structure-count-value">4 / 10</span>
+        </div>
+      </div>
 
-  <!-- 오른쪽 정보 그룹 -->
-  <div id="top-info-group">
-    <div class="info-item">
-      <span class="info-label">라운드</span>
-      <span class="info-value" id="round-value">1</span>
     </div>
 
-    <div class="info-item">
-      <span class="info-label">자원</span>
-      <span class="info-value" id="resource-value">10</span>
-    </div>
 
-    <div class="info-item">
-      <span class="info-label">인구수</span>
-      <span class="info-value" id="population-value">0 / 3</span>
-    </div>
-
-    <div class="info-item">
-      <span class="info-label">건물</span>
-      <span class="info-value" id="structure-count-value">4 / 10</span>
-    </div>
-  </div>
-
-</div>
-
-    <!-- 메인 게임 영역: 왼쪽 맵 캔버스 + 오른쪽 사이드바 -->
+    <!-- ─────────────────────────────────────────────────────────────────────
+         메인 게임 컨테이너
+         - 좌측: 게임 캔버스
+         - 우측: 사이드바 (건설 메뉴, 구조물 정보, 라운드 제어)
+         ───────────────────────────────────────────────────────────────────── -->
     <div id="game-container">
 
-      <!-- 왼쪽 섹션: 실제 게임 맵과 유닛, 구조물을 그리는 캔버스 영역 -->
+      <!-- 좌측: 게임 캔버스 영역 -->
       <div id="left-section">
-        <!-- HTML5 캔버스: 맵 타일, 기지, 구조물, 유닛을 모두 이 위에 렌더링 -->
         <canvas id="cv" width="960" height="640"></canvas>
       </div>
 
-      <!-- 오른쪽 사이드바: 건설 메뉴, 구조물 상세 정보, 라운드 제어 버튼 -->
+
+      <!-- 우측: 사이드바 -->
       <div id="sidebar">
-        <!-- 사이드바 상단 제목: 기본 상태에서는 '건설 메뉴' 표시 -->
+
+        <!-- 사이드바 헤더 -->
         <div id="sidebar-header">건설 메뉴</div>
 
-        <!-- 구조물 상세 패널
-             - 맵에서 특정 구조물을 클릭했을 때만 표시되는 영역
-             - 기본 상태에서는 숨김 (CSS에서 display 제어) -->
+
+        <!-- ───────────────────────────────────────────────────────────────
+             구조물 상세 패널
+             - 맵에서 구조물 클릭 시 표시
+             - 기본 상태에서는 숨김
+             ─────────────────────────────────────────────────────────────── -->
         <div id="structure-panel">
-          <!-- 구조물 상세 패널 상단 제목 (구조물 이름이 들어감) -->
+
           <div class="panel-header" id="structure-panel-header">구조물</div>
 
-          <!-- 선택된 구조물의 이름 및 설명을 보여주는 공통 정보 영역 -->
-          <div
-            id="structure-info"
-            style="background:#36393f; padding:12px; margin-bottom:10px; border-radius:6px;"
-          >
-            <!-- 구조물 이름 (예: 병영, 주거지 등) -->
-            <div
-              id="structure-name"
-              style="color:#ffd700; font-weight:bold; margin-bottom:5px;"
-            ></div>
-            <!-- 구조물 설명 (기능 요약 텍스트) -->
-            <div
-              id="structure-description"
-              style="color:#aaa; font-size:13px;"
-            ></div>
+          <!-- 구조물 기본 정보 -->
+          <div id="structure-info">
+            <div id="structure-name"></div>
+            <div id="structure-description"></div>
           </div>
 
-          <!-- 생산 대기열 영역
-               - 병영 구조물을 선택했을 때만 표시됨 (기본 display:none)
-               - 현재 생산 중인 유닛과 대기 중인 유닛을 최대 3칸까지 시각적으로 표현 -->
-          <div id="production-queue-container" style="display:none;">
-            <div
-              style="color:#ffd700; font-weight:bold; margin:10px 0 8px 0;"
-            >
-              생산 대기열
-            </div>
-            
-            <!-- 생산 슬롯 3칸 고정 레이아웃 -->
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-              <!-- 1번 슬롯: 현재 생산 중인 유닛 또는 비어 있는 슬롯 -->
+          <!-- 생산 대기열 (병영 전용) -->
+          <div id="production-queue-container">
+            <div class="production-queue-title">생산 대기열</div>
+            <div class="production-slots">
               <div class="production-slot" data-slot="0">
-                <!-- 비어 있을 때 표시되는 기본 텍스트 (슬롯 번호) -->
                 <div class="slot-empty">1</div>
               </div>
-
-              <!-- 2번 슬롯: 생산 대기 중인 유닛 또는 비어 있는 슬롯 -->
               <div class="production-slot" data-slot="1">
                 <div class="slot-empty">2</div>
               </div>
-
-              <!-- 3번 슬롯: 생산 대기 중인 유닛 또는 비어 있는 슬롯 -->
               <div class="production-slot" data-slot="2">
                 <div class="slot-empty">3</div>
               </div>
             </div>
           </div>
 
-          <!-- 유닛 생산 버튼 영역
-               - 병영을 선택했을 때만 보이는 영역 (display:none → block)
-               - 각 버튼은 특정 유닛 타입(melee, ranged, tank)을 생산 큐에 추가 -->
+          <!-- 유닛 생산 버튼 (병영 전용) -->
           <div id="unit-production" style="display:none;">
-            <!-- 근접 유닛 생산 버튼 -->
+
+            <!-- 근접 유닛 -->
             <div class="unit-button" data-unit="melee">
-              <!-- 버튼에 표시되는 근접 유닛 아이콘 -->
               <img class="unit-button-icon" src="images/unit_melee_move_1.png">
-              <!-- 유닛 이름과 비용/인구 정보를 표시하는 텍스트 영역 -->
               <div class="unit-button-info">
                 <div class="unit-button-name"></div>
                 <div class="unit-button-cost"></div>
               </div>
             </div>
 
-            <!-- 원거리(마법사) 유닛 생산 버튼 -->
+            <!-- 원거리 유닛 -->
             <div class="unit-button" data-unit="ranged">
               <img class="unit-button-icon" src="images/unit_ranged_move_1.png">
               <div class="unit-button-info">
@@ -241,7 +249,7 @@
               </div>
             </div>
 
-            <!-- 탱크형 유닛 생산 버튼 -->
+            <!-- 탱크 유닛 -->
             <div class="unit-button" data-unit="tank">
               <img class="unit-button-icon" src="images/unit_tank_move_1.png">
               <div class="unit-button-info">
@@ -249,34 +257,32 @@
                 <div class="unit-button-cost"></div>
               </div>
             </div>
-          </div> <!-- unit-production 끝 -->
 
-          <!-- 선택된 구조물을 판매하는 버튼
-               - 클릭 시 해당 구조물을 제거하고, 구조물 비용의 50%를 자원으로 환불 -->
-          <button class="sell-button" id="sell-structure">
-            구조물 판매 (50% 환불)
-          </button>
-          <!-- 패널 닫기용 별도 버튼은 없고, ESC 키로 패널을 닫도록 설계됨 -->
-        </div> <!-- structure-panel 끝 -->
+          </div>
 
-        <!-- 기본 건설 목록
-             - 어떤 구조물도 선택하지 않았을 때 표시되는 기본 건설 메뉴 -->
+          <!-- 구조물 판매 버튼 -->
+          <button class="sell-button" id="sell-structure">구조물 판매 (50% 환불)</button>
+
+        </div>
+
+
+        <!-- ───────────────────────────────────────────────────────────────
+             건설 목록 (기본 메뉴)
+             - 구조물 미선택 시 표시
+             ─────────────────────────────────────────────────────────────── -->
         <div id="structure-list">
-          <!-- 병영 건설 카드 -->
+
+          <!-- 병영 -->
           <div class="item-card" data-id="barracks">
-            <!-- 건설 가능한 병영의 미리보기 아이콘 -->
             <img class="item-icon" src="images/structure_barracks.png">
             <div class="item-info">
-              <!-- 구조물 이름 (스크립트에서 채워짐) -->
               <div class="item-name"></div>
-              <!-- 구조물 설명 (스크립트에서 채워짐) -->
               <div class="item-description"></div>
-              <!-- 구조물 비용 (스크립트에서 채워짐) -->
               <div class="item-cost"></div>
             </div>
           </div>
 
-          <!-- 주거지(인구수 증가용) 건설 카드 -->
+          <!-- 주거지 -->
           <div class="item-card" data-id="population">
             <img class="item-icon" src="images/structure_population.png">
             <div class="item-info">
@@ -286,7 +292,7 @@
             </div>
           </div>
 
-          <!-- 포탑(공격용 방어 구조물) 건설 카드 -->
+          <!-- 포탑 -->
           <div class="item-card" data-id="turret">
             <img class="item-icon" src="images/structure_turret.png">
             <div class="item-info">
@@ -296,7 +302,7 @@
             </div>
           </div>
 
-          <!-- 자원 채취 구조물 건설 카드 -->
+          <!-- 자원생산소 -->
           <div class="item-card" data-id="resource">
             <img class="item-icon" src="images/structure_resource.png">
             <div class="item-info">
@@ -305,34 +311,32 @@
               <div class="item-cost"></div>
             </div>
           </div>
-        </div> <!-- structure-list 끝 -->
 
-        <!-- 라운드 제어 버튼 영역
-             - 라운드 시작/정지를 제어하며, 유닛 생산 가능 여부에도 영향을 줌 -->
-        <div id="round-controls">
-          <!-- 라운드 시작 버튼: 눌러야 유닛 생산과 전투 진행이 활성화됨 -->
-          <button id="start-round-btn" class="round-btn start">
-            Start Round
-          </button>
-          <!-- 라운드 정지 버튼: 라운드가 시작되기 전에는 비활성화 상태 -->
-          
         </div>
 
-      </div> <!-- sidebar 끝 -->
-    </div> <!-- game-container 끝 -->
 
-  </div> <!-- game-wrapper 끝 -->
+        <!-- ───────────────────────────────────────────────────────────────
+             라운드 제어 버튼
+             ─────────────────────────────────────────────────────────────── -->
+        <div id="round-controls">
+          <button id="start-round-btn" class="round-btn start">Start Round</button>
+        </div>
 
-  <!-- 게임 데이터 및 설정 스크립트 (상수, 맵, 구조물/유닛 정보 등 정의) -->
-  <script src="data.js"></script>
-   <!-- 게임 데이터 및 설정 스크립트 (상수, 맵, 구조물/유닛 정보 등 정의) -->
-  <script src="gamefunction.js"></script>
-    <!-- 게임 로직 및 캔버스 렌더링 스크립트 (유닛 이동, 생산, 전투 처리 등) -->
-  <script src="game.js"></script>
+      </div>
+
+    </div>
+
+  </div>
 
 
-  <!-- UI 이벤트 처리 스크립트 (클릭, 키보드 입력, 버튼 동작 등) -->
-  <script src="ui.js"></script>
-  <script src="sound.js"></script>
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       스크립트 로드
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <script src="data.js"></script>         <!-- 게임 데이터 (상수, 맵, 구조물/유닛 정보) -->
+  <script src="gamefunction.js"></script> <!-- 게임 함수 -->
+  <script src="game.js"></script>         <!-- 게임 로직 및 렌더링 -->
+  <script src="ui.js"></script>           <!-- UI 이벤트 처리 -->
+  <script src="sound.js"></script>        <!-- 사운드 처리 -->
+
 </body>
 </html>

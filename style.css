@@ -1,465 +1,719 @@
-/* ----------------------------------
-   전체 페이지 기본 스타일
-   - 화면 중앙 정렬
-   - 배경색, 글꼴, 높이 기본값 설정
----------------------------------- */
-body{
-  margin:0;
-  background:#202225;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  font-family:'Arial', sans-serif;
+/* ╔═══════════════════════════════════════════════════════════════════════════╗
+   ║                         AI TOWER DEFENCE                                  ║
+   ║                           STYLE SHEET                                     ║
+   ╚═══════════════════════════════════════════════════════════════════════════╝ */
+
+   /*
+    1. 기본 설정 (Reset & Base)
+    └─ body
+
+    2. 메인 레이아웃
+      ├─ 2-1. 게임 래퍼
+      ├─ 2-2. 게임 컨테이너
+      └─ 2-3. 캔버스 영역
+
+    3. 상단 정보 패널
+      ├─ 3-1. 버튼 그룹 (좌측)
+      ├─ 3-2. 정보 그룹 (우측)
+      ├─ 3-3. 상단 버튼 공통 스타일
+      └─ 3-4. 개별 버튼 스타일
+
+    4. 사이드바
+      ├─ 4-1. 건설 목록
+      └─ 4-2. 라운드 제어 버튼
+
+    5. 구조물 상세 패널
+      ├─ 5-1. 구조물 정보
+      └─ 5-2. 판매 버튼
+
+    6. 유닛 생산 (병영 전용)
+      ├─ 6-1. 유닛 버튼
+      ├─ 6-2. 생산 대기열
+      └─ 6-3. 레거시 큐 아이템
+
+    7. 모달
+      ├─ 7-1. 공통 스타일
+      ├─ 7-2. API 키 모달
+      └─ 7-3. 도움말 모달
+
+    8. 경고 애니메이션 & 알림
+      ├─ 8-1. 자원 부족 경고
+      ├─ 8-2. 라운드 미시작 경고
+      └─ 8-3. 라운드 종료 알림
+   */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1. 기본 설정 (Reset & Base)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+body {
+  margin: 0;
+  background: #202225;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: 'Arial', sans-serif;
 }
 
-/* ----------------------------------
-   게임 전체 레이아웃 컨테이너
----------------------------------- */
-#game-wrapper{
-  display:flex;
-  flex-direction:column;
-  background:#000;
-  box-shadow:0 0 20px rgba(0,0,0,0.5);
-  height:fit-content;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   2. 메인 레이아웃
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   2-1. 게임 전체 래퍼
+   ───────────────────────────────────────────────────────────────────────────── */
+#game-wrapper {
+  display: flex;
+  flex-direction: column;
+  background: #000;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  height: fit-content;
 }
 
-/* ----------------------------------
-   게임 초기화(Reset) 및 디버그 버튼 공통 스타일
----------------------------------- */
+/* ─────────────────────────────────────────────────────────────────────────────
+   2-2. 게임 컨테이너 (캔버스 + 사이드바)
+   ───────────────────────────────────────────────────────────────────────────── */
+#game-container {
+  display: flex;
+  gap: 0;
+  height: 640px;
+}
 
-/* ----------------------------------
-   상단 정보 패널
-   - 라운드, 자원, 인구수, 건물 수 등 표시
----------------------------------- */
+/* ─────────────────────────────────────────────────────────────────────────────
+   2-3. 캔버스 영역 (좌측)
+   ───────────────────────────────────────────────────────────────────────────── */
+#left-section {
+  position: relative;
+  line-height: 0;
+}
+
+canvas {
+  background: #000;
+  display: block;
+  image-rendering: pixelated;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3. 상단 정보 패널
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 #top-info-panel {
   display: flex;
-  justify-content: space-between; /* 양 끝으로 정렬 */
+  justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
   background: #1a1a1a;
   border-bottom: 3px solid #444;
 }
 
-/* 버튼 그룹 */
+/* ─────────────────────────────────────────────────────────────────────────────
+   3-1. 버튼 그룹 (좌측)
+   ───────────────────────────────────────────────────────────────────────────── */
 #top-button-group {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
-/* 오른쪽 info 그룹 */
+/* ─────────────────────────────────────────────────────────────────────────────
+   3-2. 정보 그룹 (우측)
+   ───────────────────────────────────────────────────────────────────────────── */
 #top-info-group {
   display: flex;
   align-items: center;
-  gap: 30px; /* 라운드~건물 간격 */
+  gap: 30px;
 }
 
-/* info 텍스트 스타일 */
 .info-item {
   display: flex;
-  gap: 6px;
+  align-items: center;
+  gap: 10px;
   font-size: 16px;
   font-weight: 600;
 }
 
-.info-item{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.info-label{
-  color:#aaa;
-  font-size:14px;
-}
-.info-value{
-  color:#ffd700;
-  font-weight:bold;
-  font-size:18px;
+.info-label {
+  color: #aaa;
+  font-size: 14px;
 }
 
-/* ----------------------------------
-   메인 게임 컨테이너
-   - 왼쪽 캔버스 + 오른쪽 사이드바
----------------------------------- */
-#game-container{
-  display:flex;
-  gap:0;
-  height:640px;
+.info-value {
+  color: #ffd700;
+  font-weight: bold;
+  font-size: 18px;
 }
 
-/* ----------------------------------
-   왼쪽 게임 영역 (캔버스)
----------------------------------- */
-#left-section{
-  position:relative;
-  line-height:0;
-}
-canvas{
-  background:#000;
-  image-rendering:pixelated; /* 픽셀 아트가 선명하게 보이도록 처리 */
-  display:block;
-}
-
-/* ----------------------------------
-   오른쪽 사이드바
----------------------------------- */
-#sidebar{
-  width:280px;
-  background:#2f3136;
-  display:flex;
-  flex-direction:column;
-
-   
-}
-#sidebar-header{
-  background:#202225;
-  padding:16px;
-  border-bottom:2px solid #444;
-  color:#fff;
-  font-size:18px;
-  font-weight:bold;
-  text-align:center;
+/* ─────────────────────────────────────────────────────────────────────────────
+   3-3. 상단 버튼 공통 스타일
+   ───────────────────────────────────────────────────────────────────────────── */
+.top-btn {
+  padding: 10px 22px;
+  min-width: 110px;
+  height: 48px;
+  font-size: 17px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, background 0.15s ease, border 0.15s ease;
 }
 
-/* ----------------------------------
-   기본 건설 목록 (구조물 카드 리스트)
----------------------------------- */
-#structure-list{
-  padding:12px;
-  flex:1;
-  overflow-y:auto;
+.top-btn:hover {
+  transform: scale(1.06);
 }
 
-/* ----------------------------------
-   건설 가능 구조물 카드
----------------------------------- */
-.item-card{
-  background:#36393f;
-  border:2px solid #444;
-  border-radius:8px;
-  padding:12px;
-  margin-bottom:12px;
-  cursor:pointer;
-  transition:all 0.2s;
-  display:flex;
-  gap:12px;
-}
-.item-card:hover{
-  background:#40444b;
-  border-color:#5865f2;
-  transform:translateX(-4px);
-}
-.item-card.selected{
-  background:#5865f2;
-  border-color:#7289da;
+/* Reset 버튼 (빨강) */
+.reset-btn {
+  background: #d64545;
+  color: white;
+  border-color: #a83232;
 }
 
-/* 건설 카드 아이콘 영역 */
-.item-icon{
-  width:64px;
-  height:64px;
-  image-rendering:pixelated;
-  flex-shrink:0;
-  background:#000;
-  border:1px solid #555;
-  border-radius:4px;
+/* Primary 버튼 (파랑) */
+.primary-btn {
+  background: #4e6eff;
+  color: white;
+  border-color: #3d52d0;
 }
 
-/* 건설 카드 텍스트 정보 영역 */
-.item-info{
-  flex:1;
-  color:#fff;
-}
-.item-name{
-  font-size:16px;
-  font-weight:bold;
-  margin-bottom:6px;
-}
-.item-description{
-  font-size:13px;
-  color:#aaa;
-  line-height:1.4;
-}
-.item-cost{
-  font-size:12px;
-  color:#ffd700;
-  margin-top:4px;
+/* Secondary 버튼 (초록) */
+.secondary-btn {
+  background: #2ecc71;
+  color: white;
+  border-color: #26a65b;
 }
 
-/* ----------------------------------
-   라운드 시작 / 정지 버튼 영역
----------------------------------- */
-#round-controls{
-  margin-top:auto;
-  padding:16px;
-  background:#202225;
-  border-top:2px solid #444;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-.round-btn{
-  padding:12px 24px;
-  border:none;
-  border-radius:8px;
-  font-size:16px;
-  font-weight:bold;
-  cursor:pointer;
-  transition:all 0.2s;
-  box-shadow:0 2px 8px rgba(0,0,0,0.3);
-}
-.round-btn.start{
-  background:#43b581;
-  color:#fff;
-}
-.round-btn.start:hover:not(:disabled){
-  background:#3ca374;
-  transform:translateY(-2px);
-}
-.round-btn.stop{
-  background:#f04747;
-  color:#fff;
-}
-.round-btn.stop:hover:not(:disabled){
-  background:#d84040;
-  transform:translateY(-2px);
-}
-.round-btn:disabled{
-  opacity:0.5;
-  cursor:not-allowed;
+/* Utility 버튼 (회색) */
+.utility-btn {
+  background: #636e72;
+  color: white;
+  border-color: #4a4e50;
 }
 
-/* ----------------------------------
-   구조물 상세 패널
-   - 구조물 클릭 시 사이드바 안에 표시되는 패널
----------------------------------- */
-#structure-panel{
-  position:relative;
-  background:#18191c;
-  padding:16px;
-  display:none;       /* 기본은 숨김 상태 */
-  width:100%;
-  overflow-y:auto;
-  box-shadow:none;
-  box-sizing:border-box;
+/* ─────────────────────────────────────────────────────────────────────────────
+   3-4. 개별 버튼 스타일
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Refresh 버튼 */
+#refresh-btn {
+  margin-left: 10px;
+  padding: 8px 16px;
+  background: #f39c12;
+  color: #fff;
+  border: 2px solid #e67e22;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* 구조물 패널이 활성화되었을 때 */
-#structure-panel.active{
-  display:block;
+#refresh-btn:hover {
+  background: #e67e22;
+  transform: scale(1.05);
 }
 
-/* 패널 제목 (현재는 별도로 사용하지 않음) */
-.panel-header{
-  display:none;
+#refresh-btn:active {
+  transform: scale(0.95);
+  background: #d35400;
 }
 
-/* ----------------------------------
-   병영 - 유닛 생산 버튼
----------------------------------- */
-.unit-button{
-  background:#36393f;
-  border:2px solid #444;
-  border-radius:8px;
-  padding:10px;
-  margin-bottom:10px;
-  cursor:pointer;
-  transition:all 0.2s;
-  display:flex;
-  gap:10px;
-  align-items:center;
-}
-.unit-button:hover{
-  background:#5865f2;
-  border-color:#7289da;
+/* Sound 토글 버튼 */
+#sound-toggle-btn {
+  background: #43b581;
+  color: #fff;
+  border: 2px solid #3ca374;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* 유닛 아이콘 */
-.unit-button-icon{
-  width:48px;
-  height:48px;
-  image-rendering:pixelated;
-  background:#000;
-  border:1px solid #555;
-  border-radius:4px;
+#sound-toggle-btn:hover:not(.sound-off) {
+  background: #3ca374;
+  transform: scale(1.05);
 }
 
-/* 유닛 버튼 텍스트 영역 */
-.unit-button-info{
-  flex:1;
-  color:#fff;
-}
-.unit-button-name{
-  font-weight:bold;
-  margin-bottom:4px;
-}
-.unit-button-cost{
-  font-size:12px;
-  color:#ffd700;
+#sound-toggle-btn.sound-off {
+  background: #747f8d;
+  border-color: #5d6670;
 }
 
-/* 유닛 버튼 비활성화 상태 */
-.unit-button.disabled{
-  opacity:0.3;
-  pointer-events:none;
+#sound-toggle-btn.sound-off:hover {
+  background: #5d6670;
+  transform: scale(1.05);
 }
 
-/* ----------------------------------
-   구조물 판매 버튼
----------------------------------- */
-.sell-button{
-  background:#f39c12;
-  color:#fff;
-  border:none;
-  padding:8px 16px;
-  border-radius:6px;
-  cursor:pointer;
-  font-weight:bold;
-  margin-top:8px;
-  margin-bottom:8px;
-  width:100%;
-}
-.sell-button:hover{
-  background:#e67e22;
+/* Help 버튼 */
+.help-btn {
+  width: 36px;
+  height: 36px;
+  background: #5865f2;
+  color: #fff;
+  border: 2px solid #4752c4;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-right: 10px;
 }
 
-/* ----------------------------------
-   (구버전) 생산 대기열 아이템 스타일
-   - 현재는 슬롯 기반 UI로 대체되었지만,
-     레거시 스타일로 남겨둔 상태
----------------------------------- */
-.queue-item{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  background:#40444b;
-  padding:8px;
-  border-radius:4px;
-  margin-bottom:6px;
-}
-.queue-item img{
-  width:32px;
-  height:32px;
-  image-rendering:pixelated;
-}
-.queue-item.producing{
-  border:2px solid #43b581;
-}
-.queue-item.waiting{
-  border:2px solid #faa61a;
-  opacity:0.7;
-}
-.progress-bar{
-  flex:1;
-  height:8px;
-  background:#2f3136;
-  border-radius:4px;
-  overflow:hidden;
-}
-.progress-fill{
-  height:100%;
-  background:linear-gradient(90deg, #43b581, #3ca374);
-  transition:width 0.1s linear;
+.help-btn:hover {
+  background: #4752c4;
+  transform: scale(1.1);
 }
 
-/* ----------------------------------
-   (신버전) 생산 슬롯 3칸 UI
----------------------------------- */
-
-/* 슬롯 박스 공통 스타일 */
-.production-slot{
-  width:70px;
-  height:70px;
-  background:#2f3136;
-  border:2px solid #444;
-  border-radius:8px;
-  position:relative;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor: pointer;   /* 클릭 가능한 UI임을 표시 */
+/* API 설정 버튼 */
+#change-api-key-btn {
+  background: #5865f2;
+  color: #fff;
+  border: 2px solid #4752c4;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-/* 슬롯 내부 요소들이 클릭을 막지 않도록 */
+#change-api-key-btn:hover {
+  background: #4752c4;
+  transform: scale(1.05);
+}
+
+/* API 상태 배지 */
+#api-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(4px);
+  margin-left: 10px;
+  color: #fff;
+  user-select: none;
+}
+
+#api-status.connected {
+  background: linear-gradient(135deg, #43b581, #369d6b);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+#api-status.disconnected {
+  background: linear-gradient(135deg, #f04747, #c03939);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4. 사이드바
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#sidebar {
+  width: 280px;
+  background: #2f3136;
+  display: flex;
+  flex-direction: column;
+}
+
+#sidebar-header {
+  background: #202225;
+  padding: 16px;
+  border-bottom: 2px solid #444;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   4-1. 건설 목록 (구조물 카드)
+   ───────────────────────────────────────────────────────────────────────────── */
+#structure-list {
+  padding: 12px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.item-card {
+  background: #36393f;
+  border: 2px solid #444;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  gap: 12px;
+}
+
+.item-card:hover {
+  background: #40444b;
+  border-color: #5865f2;
+  transform: translateX(-4px);
+}
+
+.item-card.selected {
+  background: #5865f2;
+  border-color: #7289da;
+}
+
+.item-icon {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+  background: #000;
+  border: 1px solid #555;
+  border-radius: 4px;
+}
+
+.item-info {
+  flex: 1;
+  color: #fff;
+}
+
+.item-name {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.item-description {
+  font-size: 13px;
+  color: #aaa;
+  line-height: 1.4;
+}
+
+.item-cost {
+  font-size: 12px;
+  color: #ffd700;
+  margin-top: 4px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   4-2. 라운드 제어 버튼
+   ───────────────────────────────────────────────────────────────────────────── */
+#round-controls {
+  margin-top: auto;
+  padding: 16px;
+  background: #202225;
+  border-top: 2px solid #444;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.round-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.round-btn.start {
+  background: #43b581;
+  color: #fff;
+}
+
+.round-btn.start:hover:not(:disabled) {
+  background: #3ca374;
+  transform: translateY(-2px);
+}
+
+.round-btn.stop {
+  background: #f04747;
+  color: #fff;
+}
+
+.round-btn.stop:hover:not(:disabled) {
+  background: #d84040;
+  transform: translateY(-2px);
+}
+
+.round-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. 구조물 상세 패널
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#structure-panel {
+  position: relative;
+  background: #18191c;
+  padding: 16px;
+  display: none;
+  width: 100%;
+  overflow-y: auto;
+  box-shadow: none;
+  box-sizing: border-box;
+}
+
+#structure-panel.active {
+  display: block;
+}
+
+.panel-header {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   5-1. 구조물 정보
+   ───────────────────────────────────────────────────────────────────────────── */
+#structure-info {
+  background: #36393f;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+}
+
+#structure-name {
+  color: #ffd700;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+#structure-description {
+  color: #aaa;
+  font-size: 13px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   5-2. 구조물 판매 버튼
+   ───────────────────────────────────────────────────────────────────────────── */
+.sell-button {
+  background: #f39c12;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.sell-button:hover {
+  background: #e67e22;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   6. 유닛 생산 (병영 전용)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#unit-production {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   6-1. 유닛 버튼
+   ───────────────────────────────────────────────────────────────────────────── */
+.unit-button {
+  background: #36393f;
+  border: 2px solid #444;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.unit-button:hover {
+  background: #5865f2;
+  border-color: #7289da;
+}
+
+.unit-button.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.unit-button-icon {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+  background: #000;
+  border: 1px solid #555;
+  border-radius: 4px;
+}
+
+.unit-button-info {
+  flex: 1;
+  color: #fff;
+}
+
+.unit-button-name {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.unit-button-cost {
+  font-size: 12px;
+  color: #ffd700;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   6-2. 생산 대기열
+   ───────────────────────────────────────────────────────────────────────────── */
+#production-queue-container {
+  display: none;
+}
+
+.production-queue-title {
+  color: #ffd700;
+  font-weight: bold;
+  margin: 10px 0 8px 0;
+}
+
+.production-slots {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* 슬롯 박스 */
+.production-slot {
+  width: 70px;
+  height: 70px;
+  background: #2f3136;
+  border: 2px solid #444;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
 .production-slot * {
   pointer-events: none;
 }
 
-/* 빈 슬롯일 때 표시되는 숫자 */
-.slot-empty{
-  color:#555;
-  font-size:24px;
-  font-weight:bold;
+.slot-empty {
+  color: #555;
+  font-size: 24px;
+  font-weight: bold;
 }
 
-/* 슬롯 안의 유닛 썸네일 이미지 */
-.production-slot img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  image-rendering:pixelated;
+.production-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
 }
 
-/* 원형 진행도 표시용 SVG 오버레이 */
-.production-slot svg{
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  transform:rotate(-90deg);
-}
-
-/* SVG 배경 원 */
-.production-slot .progress-bg{
-  fill:none;
-  stroke:#1a1a1a;
-  stroke-width:4;
-}
-
-/* SVG 진행 원 */
-.production-slot .progress-active{
-  fill:none;
-  stroke:#43b581;
-  stroke-width:4;
-  stroke-linecap:round;
-  transition:stroke-dashoffset 0.1s linear;
-}
-
-/* 생산 중인 슬롯 강조 */
-.production-slot.producing{
-  border-color:#43b581;
-  box-shadow:0 0 10px rgba(67,181,129,0.5);
-}
-
-/* 대기 중인 슬롯 강조 */
-.production-slot.waiting{
-  border-color:#faa61a;
-  opacity:0.8;
-}
-
-/* ============================
-      API KEY MODAL
-============================= */
-#api-key-modal {
-  position: fixed;
+/* 진행도 원형 SVG */
+.production-slot svg {
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.8);
+  transform: rotate(-90deg);
+}
+
+.production-slot .progress-bg {
+  fill: none;
+  stroke: #1a1a1a;
+  stroke-width: 4;
+}
+
+.production-slot .progress-active {
+  fill: none;
+  stroke: #43b581;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.1s linear;
+}
+
+.production-slot.producing {
+  border-color: #43b581;
+  box-shadow: 0 0 10px rgba(67, 181, 129, 0.5);
+}
+
+.production-slot.waiting {
+  border-color: #faa61a;
+  opacity: 0.8;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   6-3. 레거시 큐 아이템 (구버전 호환용)
+   ───────────────────────────────────────────────────────────────────────────── */
+.queue-item {
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
+  gap: 8px;
+  background: #40444b;
+  padding: 8px;
+  border-radius: 4px;
+  margin-bottom: 6px;
 }
 
-#api-key-modal.hidden {
-  display: none;
+.queue-item img {
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
 }
 
+.queue-item.producing {
+  border: 2px solid #43b581;
+}
+
+.queue-item.waiting {
+  border: 2px solid #faa61a;
+  opacity: 0.7;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: #2f3136;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #43b581, #3ca374);
+  transition: width 0.1s linear;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   7. 모달 (Modal)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   7-1. 모달 공통 스타일
+   ───────────────────────────────────────────────────────────────────────────── */
 .modal-content {
   background: #2f3136;
   padding: 30px;
@@ -520,55 +774,36 @@ canvas{
   background: #555;
 }
 
-/* ============================
-      API STATUS LABEL
-============================= */
-/* ============================
-      API STATUS BADGE (CLEAN)
-============================ */
-#api-status {
-  display: inline-flex;
-  align-items: center;
+/* ─────────────────────────────────────────────────────────────────────────────
+   7-2. API 키 모달
+   ───────────────────────────────────────────────────────────────────────────── */
+#api-key-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
   justify-content: center;
-
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: bold;
-
-  border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.2);
-
-  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-  backdrop-filter: blur(4px);
-
-  margin-left: 10px;
-  color: #fff;
-  user-select: none;
+  align-items: center;
+  z-index: 1000;
 }
 
-/* 연결됨(초록) - 좀 더 고급스러운 톤 */
-#api-status.connected {
-  background: linear-gradient(135deg, #43b581, #369d6b);
-  border-color: rgba(0,0,0,0.2);
+#api-key-modal.hidden {
+  display: none;
 }
 
-/* 연결 끊김(빨강) - 눈에 띄지만 과하지 않게 */
-#api-status.disconnected {
-  background: linear-gradient(135deg, #f04747, #c03939);
-  border-color: rgba(0,0,0,0.2);
-}
-
-
-/* ============================
-   HELP MODAL
-============================= */
+/* ─────────────────────────────────────────────────────────────────────────────
+   7-3. 도움말 모달
+   ───────────────────────────────────────────────────────────────────────────── */
 #help-modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -585,6 +820,7 @@ canvas{
   overflow-y: auto;
 }
 
+/* 탭 버튼 */
 .help-tabs {
   display: flex;
   gap: 5px;
@@ -613,6 +849,7 @@ canvas{
   color: #fff;
 }
 
+/* 탭 콘텐츠 */
 .help-content {
   background: #36393f;
   border-radius: 8px;
@@ -660,6 +897,7 @@ canvas{
   color: #f04747;
 }
 
+/* 도움말 테이블 */
 .help-table {
   display: flex;
   flex-direction: column;
@@ -714,58 +952,28 @@ canvas{
   background: #4752c4;
 }
 
-/* 도움말 버튼 */
-.help-btn {
-  width: 36px;
-  height: 36px;
-  background: #5865f2;
-  color: #fff;
-  border: 2px solid #4752c4;
-  border-radius: 50%;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-right: 10px;
-}
 
-.help-btn:hover {
-  background: #4752c4;
-  transform: scale(1.1);
-}
+/* ═══════════════════════════════════════════════════════════════════════════
+   8. 경고 애니메이션 & 알림
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-
-/* API 키 설정 버튼 */
-#change-api-key-btn {
-  background: #5865f2;
-  color: #fff;
-  border: 2px solid #4752c4;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-#change-api-key-btn:hover {
-  background: #4752c4;
-  transform: scale(1.05);
-}
-
-
-/* style.css */
+/* 깜빡임 애니메이션 */
 @keyframes blink-resource {
   0%, 100% { color: #ffd700; }
   50% { color: #ff6b6b; }
 }
 
-.resource-warning {
-  animation: blink-resource 1s infinite;
+@keyframes blink-round {
+  0%, 100% { color: #ffd700; }
+  50% { color: #ff6b6b; }
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   8-1. 자원 부족 경고
+   ───────────────────────────────────────────────────────────────────────────── */
 .resource-warning {
   color: #ff6b6b !important;
+  animation: blink-resource 1s infinite;
   position: relative;
 }
 
@@ -785,119 +993,9 @@ canvas{
   margin-top: 8px;
 }
 
-#refresh-btn {
-  margin-left: 10px;
-  padding: 8px 16px;
-
-  background: #f39c12;
-  color: #fff;
-
-  border: 2px solid  #e67e22;
-  border-radius: 6px;
-
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-
-  transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3); /* 다른 버튼과 동일 */
-}
-
-#refresh-btn:hover {
-  background: #e67e22;
-  transform: scale(1.05);   /* ← 다른 버튼과 동일 "살짝 커지는 효과" */
-}
-
-#refresh-btn:active {
-  transform: scale(0.95);   /* 하나 더 일관성: 눌릴 때 작아짐 */
-  background: #d35400;
-}
-
-/* 공통 버튼 스타일 */
-.top-btn {
-  padding: 10px 22px;
-  min-width: 110px;
-  height: 48px;             /* 모든 버튼 높이 통일 */
-  font-size: 17px;
-  font-weight: 600;
-  border-radius: 10px;
-  border: 2px solid transparent;
-  cursor: pointer;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  transition: transform 0.15s ease, background 0.15s ease, border 0.15s ease;
-}
-
-/* Hover: 살짝 커지는 효과 */
-.top-btn:hover {
-  transform: scale(1.06);
-}
-
-/* Reset (danger) */
-.reset-btn {
-  background: #d64545;
-  color: white;
-  border-color: #a83232;
-}
-
-/* Primary (Refresh, API Settings) */
-.primary-btn {
-  background: #4e6eff;
-  color: white;
-  border-color: #3d52d0;
-}
-
-/* Secondary (Sound, AI ON/OFF) */
-.secondary-btn {
-  background: #2ecc71;
-  color: white;
-  border-color: #26a65b;
-}
-
-/* Utility (Help ?) */
-.utility-btn {
-  background: #636e72;
-  color: white;
-  border-color: #4a4e50;
-}
-
-#sound-toggle-btn {
-  background: #43b581;
-  color: #fff;
-  border: 2px solid #3ca374;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-
-#sound-toggle-btn:hover:not(.sound-off) {
-  background: #3ca374;
-  transform: scale(1.05);
-}
-
-#sound-toggle-btn.sound-off {
-  background: #747f8d;
-  border-color: #5d6670;
-}
-
-#sound-toggle-btn.sound-off:hover {
-  background: #5d6670;
-  transform: scale(1.05);
-}
-
-/* 라운드 미시작 경고 */
-@keyframes blink-round {
-  0%, 100% { color: #ffd700; }
-  50%      { color: #ff6b6b; }
-}
-
+/* ─────────────────────────────────────────────────────────────────────────────
+   8-2. 라운드 미시작 경고
+   ───────────────────────────────────────────────────────────────────────────── */
 .round-warning {
   animation: blink-round 1s infinite;
   position: relative;
@@ -909,7 +1007,7 @@ canvas{
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  background: #f39c12;    /* 주황 */
+  background: #f39c12;
   color: #000;
   padding: 6px 12px;
   border-radius: 4px;
@@ -917,13 +1015,15 @@ canvas{
   white-space: nowrap;
   z-index: 100;
   margin-top: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
-/* 라운드 종료 경고 배지 */
+/* ─────────────────────────────────────────────────────────────────────────────
+   8-3. 라운드 종료 알림
+   ───────────────────────────────────────────────────────────────────────────── */
 #round-value.round-ended {
   position: relative;
-  animation: blink-resource 1s infinite; /* 기존 깜빡임 재사용 */
+  animation: blink-resource 1s infinite;
 }
 
 #round-value.round-ended::after {
@@ -932,7 +1032,7 @@ canvas{
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  background: #f39c12;   /* 주황 배경 (자원 경고와 톤 통일) */
+  background: #f39c12;
   color: #000;
   padding: 6px 12px;
   border-radius: 4px;
@@ -940,5 +1040,5 @@ canvas{
   white-space: nowrap;
   z-index: 100;
   margin-top: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }

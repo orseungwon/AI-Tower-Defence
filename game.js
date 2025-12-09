@@ -1,15 +1,63 @@
-// ===========================
-// game.js - 메인 게임 로직
-// ===========================
-//
+/* ╔═══════════════════════════════════════════════════════════════════════════╗
+   ║                         AI TOWER DEFENCE                                  ║
+   ║                         GAME.JS - 메인 게임 로직                            ║
+   ╚═══════════════════════════════════════════════════════════════════════════╝ */
 
-// 캔버스 설정
+   /*
+    1. 캔버스 설정
+
+    2. 매니저 클래스 정의
+      ├─ 2-1. GameLoopManager (게임 루프)
+      ├─ 2-2. SelectionManager (구조물 선택)
+      ├─ 2-3. PlacementManager (구조물 배치 모드)
+      └─ 2-4. EffectManager (시각 효과)
+
+    3. 게임 상태 변수
+
+    4. 게임 초기화
+      └─ 4-1. UI 초기화
+
+    5. 메인 게임 루프
+
+    6. 라운드 관리
+      ├─ 6-1. 시작 / 정지
+      ├─ 6-2. 종료 체크
+      ├─ 6-3. 종료 처리
+      └─ 6-4. 경고 플래시
+
+    7. 게임 종료
+
+    8. 게임 상태 저장 / 불러오기
+      ├─ 8-1. 저장
+      ├─ 8-2. 불러오기
+      └─ 8-3. 리셋
+
+    9. UI 업데이트
+
+    10. 구조물 배치
+
+    11. AI 유닛 생성
+
+    12. 이미지 로딩 관리
+        ├─ 12-1. 로딩 완료 체크
+        └─ 12-2. 핸들러 등록
+   */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1. 캔버스 설정
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 const cv  = document.getElementById('cv');
 const ctx = cv.getContext('2d');
 
-// ===========================
-// GameLoopManager 클래스 정의
-// ===========================
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   2. 매니저 클래스 정의
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   2-1. GameLoopManager - 게임 루프 관리
+   ───────────────────────────────────────────────────────────────────────────── */
 class GameLoopManager {
   constructor() {
     this.lastUpdateTime = Date.now();
@@ -46,9 +94,9 @@ let lastUpdateTime = gameLoopManager.lastUpdateTime;
 let gameLoopRunning = gameLoopManager.gameLoopRunning;
 let aiUsesResources = gameLoopManager.aiUsesResources;
 
-// ===========================
-// SelectionManager 클래스 정의
-// ===========================
+/* ─────────────────────────────────────────────────────────────────────────────
+   2-2. SelectionManager - 구조물 선택 관리
+   ───────────────────────────────────────────────────────────────────────────── */
 class SelectionManager {
   constructor() {
     this.selectedStructure = null;
@@ -97,9 +145,9 @@ Object.defineProperty(window, 'selectedStructureType', {
 
 const structurePanel = document.getElementById('structure-panel');
 
-// ===========================
-// PlacementManager 클래스 정의
-// ===========================
+/* ─────────────────────────────────────────────────────────────────────────────
+   2-3. PlacementManager - 구조물 배치 모드 관리
+   ───────────────────────────────────────────────────────────────────────────── */
 class PlacementManager {
   constructor() {
     this.active = false;
@@ -149,9 +197,9 @@ const placementMode = new Proxy(placementManager, {
   }
 });
 
-// ===========================
-// EffectManager 클래스 정의
-// ===========================
+/* ─────────────────────────────────────────────────────────────────────────────
+   2-4. EffectManager - 시각 효과 관리 (레이저, 마법)
+   ───────────────────────────────────────────────────────────────────────────── */
 class EffectManager {
   constructor() {
     this.laserEffects = [];
@@ -199,12 +247,18 @@ Object.defineProperty(window, 'magicEffects', {
   set(val) { effectManager.magicEffects = val; }
 });
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3. 게임 상태 변수
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 // 라운드 상태 (전역 변수로 선언 - 다른 파일에서도 접근)
 var roundActive = false;
 
-// ===========================
-// 게임 초기화
-// ===========================
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4. 게임 초기화
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 function initGame() {
   console.log(`이미지 로딩 완료: ${loadedCount}/${totalImages}`);
@@ -225,12 +279,13 @@ function initGame() {
   // 라운드 상태 초기화
   roundActive = false;
   
-  // Start 버튼 활성화, Stop 버튼 비활성화
+  // Start 버튼 활성화
   document.getElementById('start-round-btn').disabled = false;
-  //document.getElementById('stop-round-btn').disabled  = true;
 }
 
-// UI 초기화
+/* ─────────────────────────────────────────────────────────────────────────────
+   4-1. UI 초기화
+   ───────────────────────────────────────────────────────────────────────────── */
 function initializeUI() {
   // 구조물 카드 초기화
   document.querySelectorAll('.item-card').forEach(card => {
@@ -258,9 +313,10 @@ function initializeUI() {
   });
 }
 
-// ===========================
-// 메인 게임 루프
-// ===========================
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. 메인 게임 루프
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 // deltaTime 최대값 (100ms = 0.1초)
 // 탭 최소화 후 복귀 시 유닛이 순간이동하는 것을 방지
@@ -272,7 +328,6 @@ function gameLoop() {
   const currentTime = Date.now();
   let deltaTime = currentTime - lastUpdateTime;
   lastUpdateTime = currentTime;
-  
 
   // deltaTime 상한선 적용 (탭 비활성화 후 복귀 시 큰 값 방지)
   if (deltaTime > MAX_DELTA_TIME) {
@@ -291,14 +346,19 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-// ===========================
-// 라운드 관리
-// ===========================
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   6. 라운드 관리
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   6-1. 라운드 시작 / 정지
+   ───────────────────────────────────────────────────────────────────────────── */
 function startRound() {
   soundManager.play('round_start');
   roundActive     = true;
   gameLoopRunning = true;
+  
   document.querySelectorAll('.unit-button').forEach(b => {
     b.classList.remove('disabled');
   });
@@ -306,12 +366,15 @@ function startRound() {
 
 function stopRound() {
   roundActive = false;
+  
   document.querySelectorAll('.unit-button').forEach(b => {
     b.classList.add('disabled');
   });
 }
 
-
+/* ─────────────────────────────────────────────────────────────────────────────
+   6-2. 라운드 종료 체크
+   ───────────────────────────────────────────────────────────────────────────── */
 function checkRoundEnd() {
   // 1. 양쪽 자원 0인지 확인
   if (gameState.resource > 0 || gameState.ai.resource > 0) {
@@ -322,7 +385,6 @@ function checkRoundEnd() {
     
     if (noUnits && noProduction && gameState.resource > 0) {
       document.getElementById('resource-value').classList.add('resource-warning');
-      
     } else {
       document.getElementById('resource-value').classList.remove('resource-warning');
     }
@@ -352,27 +414,33 @@ function checkRoundEnd() {
   
   return true;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   6-3. 라운드 종료 처리
+   ───────────────────────────────────────────────────────────────────────────── */
 function endRound() {
-   soundManager.play('round_end'); 
+  soundManager.play('round_end'); 
   roundActive = false;
-flashRoundEndWarning();
-cleanOldUnitRecords();
+  flashRoundEndWarning();
+  cleanOldUnitRecords();
   
   // 기본 자원 지급
-  gameState.resource   += 50;
+  gameState.resource    += 50;
   gameState.ai.resource += 50;
   
-  // 자원 생산소 보너스 (20으로 수정)
-  gameState.resource   += structures.player.resource.length * 20;
+  // 자원 생산소 보너스 (20)
+  gameState.resource    += structures.player.resource.length * 20;
   gameState.ai.resource += structures.ai.resource.length * 20;
   soundManager.play('resource_structure'); 
+  
   // 라운드 증가
   gameState.round++;
   
-  // ⭐ 5라운드마다 AI에게 주거지 부여 (1, 6, 11, 16...)
-  if (gameState.round % 2 === 1) { //원래는 5로 나눔
+  // 2라운드마다 AI에게 자원생산소 부여 (1, 3, 5, 7...)
+  // 원래는 5라운드마다
+  if (gameState.round % 2 === 1) {
     if (gameState.ai.structureCount < MAX_STRUCTURES) {
-      // 다음 배치 가능한 주거지 위치 찾기
+      // 다음 배치 가능한 자원생산소 위치 찾기
       const nextPos = getNextAvailablePosition('resource');
       
       if (nextPos) {
@@ -400,49 +468,74 @@ cleanOldUnitRecords();
   
   // 버튼 상태 갱신
   document.getElementById('start-round-btn').disabled = false;
-  //document.getElementById('stop-round-btn').disabled  = true;
   
   // 라운드 종료 상태 저장
   saveRoundState();
   
   console.log(`라운드 ${gameState.round - 1} 종료!`);
-
 }
 
-// ===========================
-// 게임 종료
-// ===========================
+/* ─────────────────────────────────────────────────────────────────────────────
+   6-4. 라운드 종료 경고 플래시
+   ───────────────────────────────────────────────────────────────────────────── */
+function flashRoundEndWarning(ms = 2200) {
+  const el = document.getElementById('round-value');
+  if (!el) return;
+  
+  el.classList.add('round-ended');
+
+  // 중복 타이머 방지
+  if (el._roundEndTimer) clearTimeout(el._roundEndTimer);
+  
+  el._roundEndTimer = setTimeout(() => {
+    el.classList.remove('round-ended');
+    el._roundEndTimer = null;
+  }, ms);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   7. 게임 종료
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 function endGame(winner) {
   gameLoopRunning = false;
   roundActive     = false;
   
   const message = winner === 'player' ? '승리!' : '패배!';
-
   alert(`게임 종료: ${message}`);
+  
   // 버튼 비활성화
   document.getElementById('start-round-btn').disabled = true;
-  //document.getElementById('stop-round-btn').disabled  = true;
 }
 
-// ===========================
-// 게임 상태 관리
-// ===========================
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   8. 게임 상태 저장 / 불러오기
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   8-1. 라운드 상태 저장
+   ───────────────────────────────────────────────────────────────────────────── */
 function saveRoundState() {
   gameState.baseHp = bases.find(b => b.owner === 'player').hp;
   gameState.ai.baseHp = bases.find(b => b.owner === 'ai').hp;
+  
   const data = {
     gameState:  gameState.toSaveData(),
     structures: structures.toSaveData()
-    
   };
+  
   localStorage.setItem('roundSave', JSON.stringify(data));
   console.log('라운드 저장 완료');
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   8-2. 라운드 상태 불러오기
+   ───────────────────────────────────────────────────────────────────────────── */
 function loadRoundState() {
   const saved = localStorage.getItem('roundSave');
+  
   if (!saved) {
     console.log('저장된 라운드 상태 없음 → 완전 새 게임 시작');
     return;
@@ -462,6 +555,9 @@ function loadRoundState() {
   console.log('라운드 저장 상태 복원 완료');
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   8-3. 게임 상태 리셋
+   ───────────────────────────────────────────────────────────────────────────── */
 function resetGameState() {
   // GameState 클래스의 reset 메서드 사용
   gameState.reset();
@@ -481,9 +577,10 @@ function getInitialStructures() {
   return structures.toSaveData();
 }
 
-// ===========================
-// UI 업데이트
-// ===========================
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   9. UI 업데이트
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 function updateInfoPanel() {
   document.getElementById('round-value').textContent = gameState.round;
@@ -496,9 +593,10 @@ function updateInfoPanel() {
     `${gameState.structureCount} / ${MAX_STRUCTURES}`;
 }
 
-// ===========================
-// 구조물 배치
-// ===========================
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   10. 구조물 배치
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 function placeStructure(gx, gy) {
   if (!canPlaceStructure(gx, gy)) return false;
@@ -515,7 +613,7 @@ function placeStructure(gx, gy) {
   }
   
   structures.player[placementMode.structureType].push(structureData);
-  gameState.resource      -= placementMode.cost;
+  gameState.resource       -= placementMode.cost;
   gameState.structureCount++;
   
   // 주거지(population) 구조물은 최대 인구 수 증가
@@ -542,33 +640,35 @@ function placeStructure(gx, gy) {
   return true;
 }
 
-// ===========================
-// AI 유닛 생성
-// ===========================
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   11. AI 유닛 생성
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 function generateAIUnits() {
   const round = gameState.round;
-  const stage = Math.ceil(round / 2);  // 1,2,3,4,... //원래는 5
+  const stage = Math.ceil(round / 2);  // 1, 2, 3, 4, ... (원래는 5로 나눔)
 
   // 기본 증가 폭 (라운드가 지날수록 증가)
   const base = stage;
 
   // 유닛 구성 비율
-  const meleeCount = base * 2;
+  const meleeCount  = base * 2;
   const rangedCount = stage >= 2 ? base * 1 : 0;
-  const tankCount = stage >= 3 ? Math.floor(base / 2) : 0;
+  const tankCount   = stage >= 3 ? Math.floor(base / 2) : 0;
   
   // AI 병영이 없으면 리턴
   const aiBarracks = structures.ai.barracks;
   if (aiBarracks.length === 0) return;
   
-  // ⭐ 모든 병영의 productionQueue 초기화 확인
+  // 모든 병영의 productionQueue 초기화 확인
   aiBarracks.forEach(barracks => {
     if (!barracks.productionQueue) {
       barracks.productionQueue = [];
     }
   });
   
-  // 방어 + 근접은 앞쪽 병영에
+  // 탱크 + 근접은 앞쪽 병영에
   for (let i = 0; i < tankCount + meleeCount; i++) {
     const barracks = aiBarracks[0];
     const type = i < tankCount ? 'tank' : 'melee';
@@ -591,51 +691,8 @@ function generateAIUnits() {
   
   console.log(`[라운드 ${round}] AI 자동 생성: 탱크 ${tankCount}, 근접 ${meleeCount}, 원거리 ${rangedCount}`);
 }
-// ===========================
-// 이미지 로딩 관리
-// ===========================
 
-let loadedCount     = 0;
-const totalImages   = Object.keys(images).length;
-
-function startGameIfReady() {
-  if (loadedCount >= totalImages) {
-    console.log(`모든 이미지 로드 완료: ${loadedCount}/${totalImages}`);
-    initGame();
-  }
-}
-
-// 각 이미지에 onload / onerror 핸들러 등록
-Object.entries(images).forEach(([key, img]) => {
-  if (img.complete && img.naturalWidth > 0) {
-    loadedCount++;
-  } else {
-    img.onload = () => {
-      loadedCount++;
-      //console.log(`이미지 로드: ${loadedCount}/${totalImages} - ${key}`);
-      startGameIfReady();
-    };
-    img.onerror = () => {
-      console.error(`이미지 로드 실패: ${key} (${img.src})`);
-      loadedCount++;
-      startGameIfReady();
-    };
-  }
-});
-
-// 초기 체크
-startGameIfReady();
-
-// 타임아웃 (15초)
-setTimeout(() => {
-  if (loadedCount < totalImages) {
-    console.warn(`타임아웃: ${loadedCount}/${totalImages}개만 로드됨. 강제 실행`);
-    initGame();
-  }
-}, 15000);
-
-
-// AI 전략 예시
+// AI 전략 예시 (참조용)
 const aiStrategyExample = {
   structures: {
     build: [
@@ -650,19 +707,54 @@ const aiStrategyExample = {
   units: {
     melee: 3,      // 근접 유닛 3개
     ranged: 2,     // 원거리 유닛 2개
-    tank: 1        // 방어 유닛 1개
+    tank: 1        // 탱크 유닛 1개
   }
 };
 
-function flashRoundEndWarning(ms = 2200) {
-  const el = document.getElementById('round-value');
-  if (!el) return;
-  el.classList.add('round-ended');
 
-  // 중복 타이머 방지
-  if (el._roundEndTimer) clearTimeout(el._roundEndTimer);
-  el._roundEndTimer = setTimeout(() => {
-    el.classList.remove('round-ended');
-    el._roundEndTimer = null;
-  }, ms);
+/* ═══════════════════════════════════════════════════════════════════════════
+   12. 이미지 로딩 관리
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let loadedCount   = 0;
+const totalImages = Object.keys(images).length;
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   12-1. 로딩 완료 체크 및 게임 시작
+   ───────────────────────────────────────────────────────────────────────────── */
+function startGameIfReady() {
+  if (loadedCount >= totalImages) {
+    console.log(`모든 이미지 로드 완료: ${loadedCount}/${totalImages}`);
+    initGame();
+  }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   12-2. 이미지 로드 핸들러 등록
+   ───────────────────────────────────────────────────────────────────────────── */
+Object.entries(images).forEach(([key, img]) => {
+  if (img.complete && img.naturalWidth > 0) {
+    loadedCount++;
+  } else {
+    img.onload = () => {
+      loadedCount++;
+      startGameIfReady();
+    };
+    img.onerror = () => {
+      console.error(`이미지 로드 실패: ${key} (${img.src})`);
+      loadedCount++;
+      startGameIfReady();
+    };
+  }
+});
+
+// 초기 체크
+startGameIfReady();
+
+// 타임아웃 (15초) - 일부 이미지 로드 실패해도 게임 시작
+setTimeout(() => {
+  if (loadedCount < totalImages) {
+    console.warn(`타임아웃: ${loadedCount}/${totalImages}개만 로드됨. 강제 실행`);
+    initGame();
+  }
+}, 15000);
