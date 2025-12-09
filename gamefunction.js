@@ -509,7 +509,7 @@ function updateUnitMovement(deltaTime) {
           } else if (unit.type === 'melee') {
             playThrottledSound('attack_melee');
           } else if (unit.type === 'tank') {
-            playThrottledSounde('attack_tank');
+            playThrottledSound('attack_tank');
           }
           
           // 데미지 적용
