@@ -45,18 +45,22 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    1. 기본 설정 (Reset & Base)
    ═══════════════════════════════════════════════════════════════════════════ */
-
 body {
   margin: 0;
   background: #202225;
   display: flex;
   justify-content: center;
-  align-items: flex-start;  
-  min-height: 100vh;        
+  align-items: center;
+  min-height: 100vh;
   font-family: 'Arial', sans-serif;
-  padding: 20px 0;          
 }
 
+@media (max-width: 1300px) {
+  body {
+    align-items: flex-start;
+    padding: 10px 0;
+  }
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    2. 메인 레이아웃
