@@ -162,12 +162,19 @@ Object.keys(structures.ai).forEach(structureType => {
 });
 
 
-  // 3.5. 유닛 렌더링
-  if (window.activeUnits && window.activeUnits.length > 0) {
-    window.activeUnits.forEach(unit => {
-      drawUnit(unit);
-    });
-  }
+ // 3.5. 유닛 렌더링 (체력 닳는 유닛이 위에 보이도록 정렬)
+if (window.activeUnits && window.activeUnits.length > 0) {
+  // 정렬: 체력 100%인 유닛 먼저 → 체력 닳은 유닛 나중에 (위에 그려짐)
+  const sortedUnits = [...window.activeUnits].sort((a, b) => {
+    const aRatio = a.hp / a.maxHp;
+    const bRatio = b.hp / b.maxHp;
+    return bRatio - aRatio; // 체력 비율 높은 것 먼저 (낮은 것이 나중에 = 위에)
+  });
+  
+  sortedUnits.forEach(unit => {
+    drawUnit(unit);
+  });
+}
 
   // 3.6. 레이저/마법 이펙트 렌더링
   renderLaserEffects();

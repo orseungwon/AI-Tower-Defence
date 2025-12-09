@@ -337,6 +337,8 @@ document.getElementById('reset-game-btn').addEventListener('click', () => {
   updateInfoPanel();
   
   console.log('게임 초기화 완료');
+   location.reload(true);
+
 });
 
 
