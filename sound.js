@@ -218,16 +218,34 @@ class SoundManager {
   /* ─────────────────────────────────────────────────────────────────────────
      3-3. 효과음 재생 (동시 여러 번 가능)
      ───────────────────────────────────────────────────────────────────────── */
-  playMultiple(name) {
-    if (!this.enabled || !this.loaded) return;
-    
-    const sound = this.sounds[name];
-    if (!sound) return;
+  /* ─────────────────────────────────────────────────────────────────────────
+   3-3. 효과음 재생 (동시 여러 번 가능) - 풀링 적용
+   ───────────────────────────────────────────────────────────────────────── */
+playMultiple(name) {
+  if (!this.enabled || !this.loaded) return;
+  
+  const sound = this.sounds[name];
+  if (!sound) return;
 
-    const newAudio  = new Audio(sound.audio.src);
-    newAudio.volume = this._getFinalVolume(name);
-    newAudio.play().catch(() => {});
+  // 오디오 풀 초기화
+  if (!sound.pool) {
+    sound.pool = [];
+    sound.poolIndex = 0;
+    for (let i = 0; i < 5; i++) {  // 5개 풀
+      const audio = new Audio(sound.audio.src);
+      audio.volume = this._getFinalVolume(name);
+      sound.pool.push(audio);
+    }
   }
+
+  // 풀에서 순환 사용
+  const audio = sound.pool[sound.poolIndex];
+  audio.currentTime = 0;
+  audio.volume = this._getFinalVolume(name);
+  audio.play().catch(() => {});
+  
+  sound.poolIndex = (sound.poolIndex + 1) % sound.pool.length;
+}
 
   /* ─────────────────────────────────────────────────────────────────────────
      3-4. 특정 사운드 볼륨 설정/가져오기

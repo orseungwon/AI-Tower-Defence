@@ -426,6 +426,15 @@ function canPlaceStructure(gx, gy) {
 /* ─────────────────────────────────────────────────────────────────────────────
    3-1. 유닛 이동 업데이트
    ───────────────────────────────────────────────────────────────────────────── */
+// 사운드 쓰로틀링 (같은 사운드는 100ms 간격으로만)
+const soundThrottle = {};
+function playThrottledSound(name) {
+  const now = Date.now();
+  if (!soundThrottle[name] || now - soundThrottle[name] > 100) {
+    soundManager.playMultiple(name);
+    soundThrottle[name] = now;
+  }
+}
 function updateUnitMovement(deltaTime) {
   if (!window.activeUnits) return;
 
@@ -495,11 +504,11 @@ function updateUnitMovement(deltaTime) {
               startTime: now,
               duration:  300
             });
-            soundManager.playMultiple('attack_ranged');
+            playThrottledSound('attack_ranged');
           } else if (unit.type === 'melee') {
-            soundManager.playMultiple('attack_melee');
+            playThrottledSounde('attack_melee');
           } else if (unit.type === 'tank') {
-            soundManager.playMultiple('attack_tank');
+            playThrottledSounde('attack_tank');
           }
           
           // 데미지 적용
