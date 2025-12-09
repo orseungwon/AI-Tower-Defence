@@ -55,7 +55,8 @@ body {
   font-family: 'Arial', sans-serif;
 }
 
-@media (max-width: 1300px) {
+/* 모바일 가로 모드 (높이가 작을 때만 위쪽 정렬) */
+@media (max-height: 700px) {
   body {
     align-items: flex-start;
     padding: 10px 0;

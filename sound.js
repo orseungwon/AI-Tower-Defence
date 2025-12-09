@@ -58,8 +58,8 @@ class SoundManager {
       round_end:          { path: 'sounds/round_end.mp3',          volume: 0.07 },
       
       // 유닛 공격
-      attack_melee:       { path: 'sounds/attack_melee.mp3',       volume: 0.07 },
-      attack_ranged:      { path: 'sounds/attack_ranged.mp3',      volume: 0.07 },
+      attack_melee:       { path: 'sounds/attack_melee.mp3',       volume: 0.03 },
+      attack_ranged:      { path: 'sounds/attack_ranged.mp3',      volume: 0.03 },
       attack_tank:        { path: 'sounds/attack_tank.mp3',        volume: 0.03 },
       attack_turret:      { path: 'sounds/attack_turret.mp3',      volume: 0.1  },
       
