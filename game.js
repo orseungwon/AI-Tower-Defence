@@ -329,13 +329,7 @@ function initializeUI() {
 const MAX_DELTA_TIME = 100;
 const TARGET_FPS = 30;
 const FRAME_INTERVAL = 1000 / TARGET_FPS;
-// 탭 비활성화 감지
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    // 탭 숨겨지면 시간 기록
-    lastUpdateTime = Date.now();
-  }
-});
+
 function gameLoop() {
   if (!gameLoopRunning) return;
 

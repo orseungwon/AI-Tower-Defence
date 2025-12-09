@@ -49,6 +49,15 @@
         └─ 10-3. AI 프롬프트 생성
     */
 
+// 사운드 쓰로틀링 (같은 사운드는 100ms 간격으로만)
+const soundThrottle = {};
+function playThrottledSound(name) {
+  const now = Date.now();
+  if (!soundThrottle[name] || now - soundThrottle[name] > 100) {
+    soundManager.playMultiple(name);
+    soundThrottle[name] = now;
+  }
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    1. 렌더링 함수
@@ -426,15 +435,7 @@ function canPlaceStructure(gx, gy) {
 /* ─────────────────────────────────────────────────────────────────────────────
    3-1. 유닛 이동 업데이트
    ───────────────────────────────────────────────────────────────────────────── */
-// 사운드 쓰로틀링 (같은 사운드는 100ms 간격으로만)
-const soundThrottle = {};
-function playThrottledSound(name) {
-  const now = Date.now();
-  if (!soundThrottle[name] || now - soundThrottle[name] > 100) {
-    soundManager.playMultiple(name);
-    soundThrottle[name] = now;
-  }
-}
+
 function updateUnitMovement(deltaTime) {
   if (!window.activeUnits) return;
 
@@ -506,7 +507,7 @@ function updateUnitMovement(deltaTime) {
             });
             playThrottledSound('attack_ranged');
           } else if (unit.type === 'melee') {
-            playThrottledSounde('attack_melee');
+            playThrottledSound('attack_melee');
           } else if (unit.type === 'tank') {
             playThrottledSounde('attack_tank');
           }
