@@ -51,9 +51,10 @@ body {
   background: #202225;
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100vh;
+  align-items: flex-start;  
+  min-height: 100vh;        
   font-family: 'Arial', sans-serif;
+  padding: 20px 0;          
 }
 
 
