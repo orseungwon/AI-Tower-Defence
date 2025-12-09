@@ -1047,3 +1047,13 @@ canvas {
   margin-top: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
+
+#qr-scan-btn {
+  background: #43b581;
+  margin-bottom: 10px;
+}
+
+#qr-reader {
+  border-radius: 8px;
+  overflow: hidden;
+}

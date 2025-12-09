@@ -24,7 +24,10 @@
       <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." />
       <div>
         <button id="save-api-key-btn">API 키 저장</button>
+        <button id="qr-scan-btn" type="button">📷 QR 스캔</button>
+        <div id="qr-reader" style="display:none; width:100%; margin:10px 0;"></div>
         <button class="skip-btn" id="skip-api-key-btn">건너뛰기</button>
+        
       </div>
       <p style="font-size:12px; margin-top:15px; color:#666;">
         * API 키는 브라우저에만 저장되며 서버로 전송되지 않습니다.
@@ -332,11 +335,13 @@
   <!-- ═══════════════════════════════════════════════════════════════════════
        스크립트 로드
        ═══════════════════════════════════════════════════════════════════════ -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="data.js"></script>         <!-- 게임 데이터 (상수, 맵, 구조물/유닛 정보) -->
   <script src="gamefunction.js"></script> <!-- 게임 함수 -->
   <script src="game.js"></script>         <!-- 게임 로직 및 렌더링 -->
   <script src="ui.js"></script>           <!-- UI 이벤트 처리 -->
   <script src="sound.js"></script>        <!-- 사운드 처리 -->
+  
 
 </body>
 </html>

@@ -690,3 +690,34 @@ document.getElementById('help-modal').addEventListener('click', (e) => {
     document.getElementById('help-modal').classList.add('hidden');
   }
 });
+
+// QR 스캔 기능
+let html5QrCode = null;
+
+document.getElementById('qr-scan-btn')?.addEventListener('click', () => {
+  const reader = document.getElementById('qr-reader');
+  
+  if (html5QrCode && html5QrCode.isScanning) {
+    // 스캔 중이면 중지
+    html5QrCode.stop();
+    reader.style.display = 'none';
+    return;
+  }
+  
+  reader.style.display = 'block';
+  html5QrCode = new Html5Qrcode("qr-reader");
+  
+  html5QrCode.start(
+    { facingMode: "environment" },  // 후면 카메라
+    { fps: 10, qrbox: 250 },
+    (decodedText) => {
+      // 스캔 성공
+      document.getElementById('api-key-input').value = decodedText;
+      html5QrCode.stop();
+      reader.style.display = 'none';
+    },
+    (error) => {
+      // 스캔 중 에러 (무시)
+    }
+  );
+});
